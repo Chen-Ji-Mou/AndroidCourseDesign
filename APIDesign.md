@@ -13,7 +13,7 @@
   - [将某个通知变为已读](#将某个通知变为已读)
 - [图片（picture）](#图片picture)
   - [上传一个新图片](#上传一个新图片)
-  - [获得一个新图片](#获得一个新图片)
+  - [图片地址](#图片地址)
 - [评论（comment）](#评论comment)
   - [增加一个评论](#增加一个评论)
   - [查看一个动态下的所有评论](#查看一个动态下的所有评论)
@@ -26,7 +26,7 @@
 
 ### 注册
 
-POST: /api/user/register/
+POST: /api/user/register
 
 用户名不许重复，密码最少6位。这两个参数都是必填项。
 
@@ -51,7 +51,7 @@ POST: /api/user/register/
 
 ### 登陆
 
-POST: /api/user/login/
+POST: /api/user/login
 
 ```json
 {
@@ -124,7 +124,7 @@ GET: /api/post/profile（带token）
 
 ### 发布新动态
 
-POST: /api/post/（带token）
+POST: /api/post（带token）
 
 ```json
 {
@@ -152,7 +152,7 @@ POST: /api/post/（带token）
 
 ### 删除某条动态
 
-DELETE: /api/post/（带token）
+DELETE: /api/post（带token）
 
 ```json
 {
@@ -216,7 +216,7 @@ POST: /api/notice/read（带token）
 
 ### 上传一个新图片
 
-POST: /api/picture/（带token）
+POST: /api/picture（带token）
 
 ```json
 {
@@ -236,7 +236,7 @@ POST: /api/picture/（带token）
 }
 ```
 
-### 获得一个新图片
+### 图片地址
 
 GET：/api/picture/:id（带token，注意这里有一个query参数`id`）
 
@@ -256,7 +256,7 @@ GET：/api/picture/:id（带token，注意这里有一个query参数`id`）
 
 ### 增加一个评论
 
-POST：/api/comment/（带token）
+POST：/api/comment（带token）
 
 ```json
 {
@@ -314,7 +314,7 @@ GET：/api/comment/list（带token）
 
 ### 删除某条评论
 
-DELETE: /api/comment/（带token）
+DELETE: /api/comment（带token）
 
 ```json
 {
@@ -326,7 +326,7 @@ DELETE: /api/comment/（带token）
 
 ### 点赞一个动态（取消的话再传一次就好）
 
-POST：/api/star/（带token）
+POST：/api/star（带token）
 
 ```json
 {
