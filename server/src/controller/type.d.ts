@@ -17,3 +17,4 @@ export type GetUserPostRequestDate = { userId: string };
 export type DeletePostRequestData = { id: string };
 
 export type UploadPictureRequestData = { base64: string };
+export type GetPictureRequestData = { id: string };

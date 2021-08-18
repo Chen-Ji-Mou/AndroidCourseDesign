@@ -25,3 +25,13 @@ export class Post {
         this.date = date;
     }
 }
+
+export class Picture {
+    id: string;
+    base64: string;
+
+    constructor(id?: string, base64?: string) {
+        this.id = id;
+        this.base64 = base64;
+    }
+}
