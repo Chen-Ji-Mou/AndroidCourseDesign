@@ -9,7 +9,7 @@ export default function addUserRouter(router: Router<any, {}>, database: MySQL) 
          * 注册
          */
         .post("/api/user/register", handler(
-            async (ctx: CTX) => {
+            async (ctx) => {
                 // todo
             })
         )
@@ -17,7 +17,7 @@ export default function addUserRouter(router: Router<any, {}>, database: MySQL) 
          * 登陆
          */
         .post("/api/user/login", handler(
-            async (ctx: CTX) => {
+            async (ctx) => {
                 // todo
             })
         )

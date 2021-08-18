@@ -1,3 +1,6 @@
+import Koa from 'koa';
+import Router from 'koa-router';
+
 export type CTX = Koa.ParameterizedContext<
     any,
     Router.IRouterParamContext<any, {}>,

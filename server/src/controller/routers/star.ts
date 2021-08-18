@@ -9,7 +9,7 @@ export default function addStarRouter(router: Router<any, {}>, database: MySQL) 
          * 点赞一个动态（取消的话再传一次就好）
          */
         .post("/api/star", handler(
-            async (ctx: CTX) => {
+            async (ctx) => {
                 // todo
             })
         )
@@ -18,7 +18,7 @@ export default function addStarRouter(router: Router<any, {}>, database: MySQL) 
          * 查看一个动态下的点赞数
          */
         .get("/api/star/count", handler(
-            async (ctx: CTX) => {
+            async (ctx) => {
                 // todo
             })
         )

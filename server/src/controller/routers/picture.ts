@@ -9,7 +9,7 @@ export default function addPictureRouter(router: Router<any, {}>, database: MySQ
          * 上传一个新图片
          */
         .post("/api/picture", handler(
-            async (ctx: CTX) => {
+            async (ctx) => {
                 // todo
             })
         )
@@ -18,7 +18,7 @@ export default function addPictureRouter(router: Router<any, {}>, database: MySQ
          * 图片地址
          */
         .get("/api/picture/:id", handler(
-            async (ctx: CTX) => {
+            async (ctx) => {
                 // todo
             })
         )

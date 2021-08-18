@@ -9,7 +9,7 @@ export default function addNoticeRouter(router: Router<any, {}>, database: MySQL
          * 获取某个用户的所有通知
          */
         .get("/api/notice/all", handler(
-            async (ctx: CTX) => {
+            async (ctx) => {
                 // todo
             })
         )
@@ -18,7 +18,7 @@ export default function addNoticeRouter(router: Router<any, {}>, database: MySQL
          * 某个通知变为已读
          */
         .post("/api/notice/read", handler(
-            async (ctx: CTX) => {
+            async (ctx) => {
                 // todo
             })
         )
