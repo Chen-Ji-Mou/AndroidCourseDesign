@@ -229,7 +229,8 @@ POST: /api/picture（带token）
 ```json
 {
     "data":{
-        "id":"<string>", // 图片的id
+        "id":"<string>",     // 图片的id
+        "base64":"<string>"  // 图片的base64
     },
     "code":"0",
     "msg":"success"
