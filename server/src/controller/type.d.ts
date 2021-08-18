@@ -15,3 +15,5 @@ export type LoginRequestData = RegisterRequestData;
 export type NewPostRequestData = { content: string, pictures: Array<string> };
 export type GetUserPostRequestDate = { userId: string };
 export type DeletePostRequestData = { id: string };
+
+export type UploadPictureRequestData = { base64: string };
