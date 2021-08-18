@@ -7,6 +7,7 @@ import { User } from '../model';
 import { v4 as uuid } from 'uuid';
 import jwt from 'jsonwebtoken';
 import config from './../../../config';
+import { ApiError } from '../../model';
 
 export default function addUserRouter(router: Router<any, {}>, database: MySQL) {
     router
@@ -17,15 +18,15 @@ export default function addUserRouter(router: Router<any, {}>, database: MySQL) 
             async (ctx) => {
                 const requestData: RegisterRequestData = ctx.request.body;
 
-                if (!requestData.name) return ResultUtil.error(null, "用户名为空", -1);
-                if (!requestData.password) return ResultUtil.error(null, "密码为空", -1);
-                if (requestData.password.length < 6) return ResultUtil.error(null, "密码长度小于6位");
+                if (!requestData.name) throw new ApiError("用户名为空");
+                if (!requestData.password) throw new ApiError("密码为空");
+                if (requestData.password.length < 6) throw new ApiError("密码长度小于6位");
 
                 const [searchName] = await database.execute(
                     `SELECT * FROM user WHERE name='${requestData.name}'`
                 ) as [Array<User>, any];
 
-                if (searchName.length > 0) return ResultUtil.error(null, "用户名已被注册", -1);
+                if (searchName.length > 0) throw new ApiError("用户名已被注册");
 
                 const newUser: User = { id: uuid(), ...requestData };
                 await database.execute(
@@ -49,15 +50,15 @@ export default function addUserRouter(router: Router<any, {}>, database: MySQL) 
             async (ctx) => {
                 const requestData: LoginRequestData = ctx.request.body;
 
-                if (!requestData.name) return ResultUtil.error(null, "用户名为空", -1);
-                if (!requestData.password) return ResultUtil.error(null, "密码为空", -1);
-                if (requestData.password.length < 6) return ResultUtil.error(null, "密码长度小于6位");
+                if (!requestData.name) throw new ApiError("用户名为空");
+                if (!requestData.password) throw new ApiError("密码为空");
+                if (requestData.password.length < 6) throw new ApiError("密码长度小于6位");
 
                 const [searchName] = await database.execute(
                     `SELECT * FROM user WHERE name='${requestData.name}' AND password='${requestData.password}'`
                 ) as [Array<User>, any];
 
-                if (searchName.length === 0) return ResultUtil.error(null, "用户名不存在或密码错误", -1);
+                if (searchName.length === 0) throw new ApiError("用户名不存在或密码错误");
 
                 const loginUser = searchName[0];
                 const tokenData: TokenData = pickField(loginUser, ["id", "name"]);
