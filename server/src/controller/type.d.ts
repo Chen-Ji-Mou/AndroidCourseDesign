@@ -7,4 +7,7 @@ export type CTX = Koa.ParameterizedContext<
     any
 >;
 
-export type TokenData = {id: string, name: string};
+export type TokenData = { id: string, name: string };
+
+export type RegisterRequestData = { name: string, password: string };
+export type LoginRequestData = RegisterRequestData;
