@@ -9,3 +9,19 @@ export class User {
         this.password = password;
     }
 }
+
+export class Post {
+    id: string;
+    content: string;
+    userId: string;
+    pictures: Array<string>;
+    date: number;
+
+    constructor(id?: string, content?: string, userId?: string, pictures?: Array<string>, date?: number) {
+        this.id = id;
+        this.content = content;
+        this.userId = userId;
+        this.pictures = pictures;
+        this.date = date;
+    }
+}

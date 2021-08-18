@@ -11,3 +11,7 @@ export type TokenData = { id: string, name: string };
 
 export type RegisterRequestData = { name: string, password: string };
 export type LoginRequestData = RegisterRequestData;
+
+export type NewPostRequestData = { content: string, pictures: Array<string> };
+export type GetUserPostRequestDate = { userId: string };
+export type DeletePostRequestData = { id: string };
