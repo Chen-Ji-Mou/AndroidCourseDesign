@@ -18,3 +18,5 @@ export type DeletePostRequestData = { id: string };
 
 export type UploadPictureRequestData = { base64: string };
 export type GetPictureRequestData = { id: string };
+
+export type NewCommentRequestData = { postId: string, content: string };

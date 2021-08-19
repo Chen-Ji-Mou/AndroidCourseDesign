@@ -262,7 +262,6 @@ POST：/api/comment（带token）
 ```json
 {
     "postId":"<string>",
-    "userId":"<string>",
     "content":"<string>"
 }
 ```
@@ -272,7 +271,11 @@ POST：/api/comment（带token）
 ```json
 {
     "data":{
-        "id":"<string>"
+        "id":"<string>",
+        "postId":"<string>",
+        "userId":"<string>",
+        "content":"<string>",
+        "date":"<string>"
     },
     "code":0,
     "msg":"success"
