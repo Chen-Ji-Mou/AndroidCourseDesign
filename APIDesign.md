@@ -346,7 +346,9 @@ POST：/api/star（带token）
 ```json
 {
     "data":{
-        "id":"<string>"
+        "id":"<string>",
+        "postId":"<string>",
+        "userId":"<string>"
     },
     "code":0,
     "msg":"success"

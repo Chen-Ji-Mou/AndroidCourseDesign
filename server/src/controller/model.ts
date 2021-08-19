@@ -51,3 +51,15 @@ export class Comment {
         this.date = date;
     }
 }
+
+export class Star {
+    id: string;
+    postId: string;
+    userId: string;
+
+    constructor(id?: string, postId?: string, userId?: string) {
+        this.id = id;
+        this.postId = postId;
+        this.userId = userId;
+    }
+}

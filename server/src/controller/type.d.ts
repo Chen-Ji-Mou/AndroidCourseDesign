@@ -22,3 +22,5 @@ export type GetPictureRequestData = { id: string };
 export type NewCommentRequestData = { postId: string, content: string };
 export type CommentListOfPostRequestData = { postId: string };
 export type DeleteCommentRequestData = { id: string };
+
+export type NewStarRequestData = { postId: string };
