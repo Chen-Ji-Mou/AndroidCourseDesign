@@ -24,3 +24,5 @@ export type CommentListOfPostRequestData = { postId: string };
 export type DeleteCommentRequestData = { id: string };
 
 export type NewStarRequestData = { postId: string };
+
+export type ReadNoticeRequestData = { id: string };
