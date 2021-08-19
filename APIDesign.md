@@ -262,7 +262,6 @@ POST：/api/comment（带token）
 ```json
 {
     "postId":"<string>",
-    "userId":"<string>",
     "content":"<string>"
 }
 ```
@@ -272,7 +271,11 @@ POST：/api/comment（带token）
 ```json
 {
     "data":{
-        "id":"<string>"
+        "id":"<string>",
+        "postId":"<string>",
+        "userId":"<string>",
+        "content":"<string>",
+        "date":"<string>"
     },
     "code":0,
     "msg":"success"
@@ -298,12 +301,14 @@ GET：/api/comment/list（带token）
             "id":"<string>",
             "content":"<string>",
             "userId":"<string>",
+            "postId":"<string>",
             "date":"<number>"
         },
         {
             "id":"<string>",
             "content":"<string>",
             "userId":"<string>",
+            "postId":"<string>",
             "date":"<number>"
         },
         ...... // 略
@@ -341,7 +346,9 @@ POST：/api/star（带token）
 ```json
 {
     "data":{
-        "id":"<string>"
+        "id":"<string>",
+        "postId":"<string>",
+        "userId":"<string>"
     },
     "code":0,
     "msg":"success"

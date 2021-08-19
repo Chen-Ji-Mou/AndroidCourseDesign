@@ -35,3 +35,31 @@ export class Picture {
         this.base64 = base64;
     }
 }
+
+export class Comment {
+    id: string;
+    content: string;
+    userId: string;
+    postId: string;
+    date: number;
+
+    constructor(id?: string, content?: string, userId?: string, postId?: string, date?: number) {
+        this.id = id;
+        this.content = content;
+        this.userId = userId;
+        this.postId = postId;
+        this.date = date;
+    }
+}
+
+export class Star {
+    id: string;
+    postId: string;
+    userId: string;
+
+    constructor(id?: string, postId?: string, userId?: string) {
+        this.id = id;
+        this.postId = postId;
+        this.userId = userId;
+    }
+}
