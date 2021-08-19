@@ -8,6 +8,7 @@
   - [获取某个人的动态](#获取某个人的动态)
   - [发布新动态](#发布新动态)
   - [删除某条动态](#删除某条动态)
+  - [单独获取某个动态信息](#单独获取某个动态信息)
 - [通知（notice）](#通知notice)
   - [获取某个用户的所有通知](#获取某个用户的所有通知)
   - [将某个通知变为已读](#将某个通知变为已读)
@@ -160,6 +161,28 @@ DELETE: /api/post（带token）
 }
 ```
 
+### 单独获取某个动态信息
+
+GET: /api/post/:id （带token，注意这里的参数id）
+
+返回的响应数据为：
+
+```json
+{
+    "data":{
+        "id":"<string>",
+        "content":"<string>",
+        "userId":"<string>",
+        "pictures":[
+            "/api/picture/<pictureId1>",
+            "/api/picture/<pictureId2>"
+        ],
+        "date":"<number>"
+    },
+    "code":0,
+    "msg":"success"
+}
+```
 
 ## 通知（notice）
 
@@ -241,14 +264,14 @@ POST: /api/picture（带token）
 
 ### 图片地址
 
-GET：/api/picture/:id（带token，注意这里有一个query参数`id`）
+GET：/api/picture/:id（带token，注意这里有一个参数`id`）
 
 现在先暂时返回 base64 ，返回的响应数据为：
-
 ```json
 {
     "data":{
-        "id":"<string>"// 图片的id
+        "id":"<string>",     // 图片的id
+        "base64":"<string>"  // 图片的base64
     },
     "code":"0",
     "msg":"success"

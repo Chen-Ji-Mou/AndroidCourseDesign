@@ -67,7 +67,7 @@ export default function addCommentRouter(router: Router<any, {}>, database: MySQ
                 if (searchPost.length === 0) throw new ApiError("目标动态不存在");
 
                 const [searchCommentList] = await database.execute(
-                    `SELECT * FROM comment WHERE post_id='${requestData.postId}'`
+                    `SELECT * FROM comment WHERE post_id='${requestData.postId}' ORDER BY date`
                 ) as [Array<any>, any];
                 const commentList: Array<Comment> = searchCommentList.map(x => {
                     return {

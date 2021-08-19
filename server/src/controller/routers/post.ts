@@ -4,7 +4,7 @@ import { toHumpFieldObject } from "../../utlis";
 import { handler, verifyToken } from "../helper";
 import { Post, User } from "../model";
 import { ResultUtil } from 'ningx';
-import { DeletePostRequestData, GetUserPostRequestDate as getUserPostRequestData, NewPostRequestData } from "../type";
+import { DeletePostRequestData, GetAPostRequestData, GetUserPostRequestDate as getUserPostRequestData, NewPostRequestData } from "../type";
 import { ApiError } from "../../model";
 import { v4 as uuid } from 'uuid';
 
@@ -106,6 +106,31 @@ export default function addPostRouter(router: Router<any, {}>, database: MySQL) 
                     `DELETE FROM post WHERE id='${requestData.id}'`
                 );
                 return ResultUtil.success(null);
+            })
+        )
+
+        /** 
+         * 获取某条动态
+         */
+        .get("/api/post/:id", handler(
+            async (ctx) => {
+                const token = ctx.header.authorization;
+                const tokenData = verifyToken(token);
+
+                const requestData: GetAPostRequestData = ctx.params as any;
+                if (!requestData.id) throw new ApiError("目标id不能为空");
+
+                const [searchPost] = await database.execute(
+                    `SELECT * FROM post WHERE id='${requestData.id}'`
+                ) as [Array<any>, any];
+                if (searchPost.length === 0) throw new ApiError("目标动态不存在");
+                
+                const targetPost : Post = {
+                    ...toHumpFieldObject(searchPost[0]),
+                    pictures: searchPost[0].pictures.split(",")
+                };
+
+                return ResultUtil.success(targetPost);
             })
         )
 }

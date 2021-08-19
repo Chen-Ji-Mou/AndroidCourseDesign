@@ -20,7 +20,7 @@ export default function addNoticeRouter(router: Router<any, {}>, database: MySQL
                 const tokenData = verifyToken(token);
 
                 const [searchNoticeList] = await database.execute(
-                    `SELECT * FROM notice WHERE receiver='${tokenData.id}'`
+                    `SELECT * FROM notice WHERE receiver='${tokenData.id}' ORDER BY date;`
                 ) as [Array<any>, any];
                 const noticeList: Array<Notice> = searchNoticeList.map(x => {
                     return {
