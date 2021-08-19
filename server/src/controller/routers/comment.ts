@@ -1,7 +1,7 @@
 import Router from 'koa-router';
 import { handler, verifyToken } from '../helper';
 import { MySQL } from '../../database';
-import { CommentListOfPostRequestData, CTX, NewCommentRequestData } from '../type';
+import { CommentListOfPostRequestData, DeleteCommentRequestData, NewCommentRequestData } from '../type';
 import { ApiError } from './../../model';
 import { v4 as uuid } from 'uuid';
 import { Comment } from '../model';
@@ -67,7 +67,7 @@ export default function addCommentRouter(router: Router<any, {}>, database: MySQ
                         ...toHumpFieldObject(x)
                     }
                 })
-                
+
                 return ResultUtil.success(commentList);
             })
         )
@@ -77,7 +77,25 @@ export default function addCommentRouter(router: Router<any, {}>, database: MySQ
          */
         .delete("/api/comment", handler(
             async (ctx) => {
-                // todo
+                const token = ctx.header.authorization;
+                const tokenData = verifyToken(token);
+
+                const requestData: DeleteCommentRequestData = ctx.request.body;
+                if (!requestData.id) throw new ApiError("评论id不能为空");
+
+                const [searchComment] = await database.execute(
+                    `SELECT * FROM comment WHERE id='${requestData.id}'`
+                ) as [Array<any>, any];
+                if (searchComment.length === 0) throw new ApiError("目标评论不存在");
+
+                const targetComment: Comment = { ...toHumpFieldObject(searchComment[0]) };
+                if (targetComment.userId !== tokenData.id) throw new ApiError("不能删除别人的评论");
+
+                await database.execute(
+                    `DELETE FROM comment WHERE id='${requestData.id}'`
+                );
+
+                return ResultUtil.success(null);
             })
         )
 }
