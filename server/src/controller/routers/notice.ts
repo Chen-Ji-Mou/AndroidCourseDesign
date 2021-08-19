@@ -4,6 +4,8 @@ import { MySQL } from '../../database';
 import { database } from '..';
 import { Notice, User } from '../model';
 import { v4 as uuid } from 'uuid';
+import { toHumpFieldObject } from '../../utlis';
+import { ResultUtil } from 'ningx';
 
 export default function addNoticeRouter(router: Router<any, {}>, database: MySQL) {
     router
@@ -12,7 +14,19 @@ export default function addNoticeRouter(router: Router<any, {}>, database: MySQL
          */
         .get("/api/notice/all", handler(
             async (ctx) => {
-                // todo
+                const token = ctx.header.authorization;
+                const tokenData = verifyToken(token);
+
+                const [searchNoticeList] = await database.execute(
+                    `SELECT * FROM notice WHERE receiver='${tokenData.id}'`
+                ) as [Array<any>, any];
+                const noticeList: Array<Notice> = searchNoticeList.map(x => {
+                    return {
+                        ...toHumpFieldObject(x)
+                    }
+                })
+                if (noticeList.length === 0) return ResultUtil.success([]);
+                else return ResultUtil.success(noticeList);
             })
         )
 
