@@ -48,7 +48,23 @@ export default function addStarRouter(router: Router<any, {}>, database: MySQL) 
          */
         .get("/api/star/count", handler(
             async (ctx) => {
-                // todo
+                const token = ctx.header.authorization;
+                const tokenData = verifyToken(token);
+
+                const requestData: NewStarRequestData = ctx.query as any;
+                if (!requestData.postId) throw new ApiError("postId不能为空");
+
+                const [searchPost] = await database.execute(
+                    `SELECT id FROM post WHERE id='${requestData.postId}'`
+                ) as [Array<any>, any];
+                if (searchPost.length === 0) throw new ApiError("目标动态不存在");
+
+                const [searchCount] = await database.execute(
+                    `SELECT count(*) as count FROM star WHERE post_id='${requestData.postId}' GROUP BY post_id;`
+                ) as [Array<any>, any];
+
+                if (searchCount[0]) return ResultUtil.success(searchCount[0]);
+                else return ResultUtil.success({count: 0});
             })
         )
 }
