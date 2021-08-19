@@ -301,12 +301,14 @@ GET：/api/comment/list（带token）
             "id":"<string>",
             "content":"<string>",
             "userId":"<string>",
+            "postId":"<string>",
             "date":"<number>"
         },
         {
             "id":"<string>",
             "content":"<string>",
             "userId":"<string>",
+            "postId":"<string>",
             "date":"<number>"
         },
         ...... // 略

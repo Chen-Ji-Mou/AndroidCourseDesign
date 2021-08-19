@@ -1,11 +1,12 @@
 import Router from 'koa-router';
 import { handler, verifyToken } from '../helper';
 import { MySQL } from '../../database';
-import { CTX, NewCommentRequestData } from '../type';
+import { CommentListOfPostRequestData, CTX, NewCommentRequestData } from '../type';
 import { ApiError } from './../../model';
 import { v4 as uuid } from 'uuid';
 import { Comment } from '../model';
 import { ResultUtil } from 'ningx';
+import { toHumpFieldObject } from '../../utlis';
 
 export default function addCommentRouter(router: Router<any, {}>, database: MySQL) {
     router
@@ -47,7 +48,27 @@ export default function addCommentRouter(router: Router<any, {}>, database: MySQ
          */
         .get("/api/comment/list", handler(
             async (ctx) => {
-                // todo
+                const token = ctx.header.authorization;
+                const tokenData = verifyToken(token);
+
+                const requestData: CommentListOfPostRequestData = ctx.query as any;
+                if (!requestData.postId) throw new ApiError("postId不能为空");
+
+                const [searchPost] = await database.execute(
+                    `SELECT id FROM post WHERE id='${requestData.postId}'`
+                ) as [Array<any>, any];
+                if (searchPost.length === 0) throw new ApiError("目标动态不存在");
+
+                const [searchCommentList] = await database.execute(
+                    `SELECT * FROM comment WHERE post_id='${requestData.postId}'`
+                ) as [Array<any>, any];
+                const commentList: Array<Comment> = searchCommentList.map(x => {
+                    return {
+                        ...toHumpFieldObject(x)
+                    }
+                })
+                
+                return ResultUtil.success(commentList);
             })
         )
 
