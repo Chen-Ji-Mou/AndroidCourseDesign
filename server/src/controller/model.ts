@@ -63,3 +63,23 @@ export class Star {
         this.userId = userId;
     }
 }
+
+export class Notice {
+    id: string;
+    sender: string;
+    receiver: string;
+    postId: string;
+    content: "点赞了你的动态" | "评论了你的动态";
+    read: boolean;
+    date: number;
+
+    constructor(id?: string, sender?: string, receiver?: string, postId?: string, content?: Notice['content'], read?: boolean, date?: number) {
+        this.id = id;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.postId = postId;
+        this.content = content;
+        this.read = read;
+        this.date = date;
+    }
+}

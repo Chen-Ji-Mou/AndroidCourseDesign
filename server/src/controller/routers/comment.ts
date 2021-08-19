@@ -4,9 +4,10 @@ import { MySQL } from '../../database';
 import { CommentListOfPostRequestData, DeleteCommentRequestData, NewCommentRequestData } from '../type';
 import { ApiError } from './../../model';
 import { v4 as uuid } from 'uuid';
-import { Comment } from '../model';
+import { Comment, Post } from '../model';
 import { ResultUtil } from 'ningx';
 import { toHumpFieldObject } from '../../utlis';
+import { notice } from './notice';
 
 export default function addCommentRouter(router: Router<any, {}>, database: MySQL) {
     router
@@ -23,9 +24,10 @@ export default function addCommentRouter(router: Router<any, {}>, database: MySQ
                 if (!requestData.postId) throw new ApiError("postId不能为空");
 
                 const [searchPost] = await database.execute(
-                    `SELECT id FROM post WHERE id='${requestData.postId}'`
+                    `SELECT * FROM post WHERE id='${requestData.postId}'`
                 ) as [Array<any>, any];
                 if (searchPost.length === 0) throw new ApiError("目标动态不存在");
+                const targetPost: Post = { ...toHumpFieldObject(searchPost[0]) }
 
                 const newComment: Comment = {
                     id: uuid(),
@@ -39,6 +41,11 @@ export default function addCommentRouter(router: Router<any, {}>, database: MySQ
                     `INSERT INTO comment (id, post_id, user_id, content, date) VALUES('${newComment.id}','${newComment.postId}','${newComment.userId}','${newComment.content}','${newComment.date}');`
                 );
 
+                // todo remove comment
+                // if (tokenData.id !== targetPost.userId) {
+                await notice(tokenData.id, targetPost.userId, requestData.postId, "点赞了你的动态");
+                // }
+                
                 return ResultUtil.success(newComment);
             })
         )

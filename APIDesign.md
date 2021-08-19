@@ -178,6 +178,7 @@ GET: /api/notice/all （带token）
         {
             "id":"<string>",
             "sender":"Therainisme",
+            "receiver":"<string>",    // 被通知者的id
             "content":"点赞了你的图片", 
             "postId":"<string>",               
             "read":true,
@@ -186,6 +187,7 @@ GET: /api/notice/all （带token）
         {
             "id":"<string>",
             "sender":"GaiZi",
+            "receiver":"<string>",    // 被通知者的id
             "content":"评论了你的图片",
             "postId":"<string>",
             "read":false,
