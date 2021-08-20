@@ -20,7 +20,7 @@
             android:background="@color/colorPrimary"
             app:titleTextColor="@color/white" />
         
-        <androidx.viewpager.widget.ViewPager
+        <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewpager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -29,7 +29,8 @@
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation_view"
             android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize" />
+            android:layout_height="?android:attr/actionBarSize"
+            app:menu="@menu/menu_main_bottom_navigation" />
         
     </LinearLayout>
 
