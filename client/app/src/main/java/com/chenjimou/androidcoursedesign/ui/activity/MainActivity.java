@@ -1,22 +1,21 @@
-package com.chenjimou.androidcoursedesign.ui;
+package com.chenjimou.androidcoursedesign.ui.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 
 import com.chenjimou.androidcoursedesign.R;
 import com.chenjimou.androidcoursedesign.databinding.ActivityMainBinding;
+import com.chenjimou.androidcoursedesign.ui.fragment.HomeFragment;
+import com.chenjimou.androidcoursedesign.ui.fragment.PersonalFragment;
+import com.chenjimou.androidcoursedesign.ui.fragment.ShareFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;

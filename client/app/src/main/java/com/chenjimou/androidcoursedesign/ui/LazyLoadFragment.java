@@ -1,4 +1,4 @@
-package com.chenjimou.androidcoursedesign;
+package com.chenjimou.androidcoursedesign.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -28,9 +28,9 @@ public abstract class LazyLoadFragment extends Fragment
             @Nullable
                     Bundle savedInstanceState)
     {
-        ViewBinding binding = createViewBinding(inflater, container);
-        init(binding);
-        return binding.getRoot();
+        ViewBinding viewBinding = createViewBinding(inflater, container);
+        init(viewBinding);
+        return viewBinding.getRoot();
     }
 
     @Override
@@ -39,7 +39,7 @@ public abstract class LazyLoadFragment extends Fragment
         super.onResume();
         if (isFirstLoad)
         {
-            initData();
+            initDataFirst();
             isFirstLoad = false;
         }
     }
@@ -52,10 +52,10 @@ public abstract class LazyLoadFragment extends Fragment
     /**
      * 初始化监听（空实现）
      */
-    protected void init(ViewBinding binding){ }
+    protected void init(ViewBinding viewBinding){ }
 
     /**
      * 第一次数据初始化（空实现）
      */
-    protected void initData(){ }
+    protected void initDataFirst(){ }
 }
