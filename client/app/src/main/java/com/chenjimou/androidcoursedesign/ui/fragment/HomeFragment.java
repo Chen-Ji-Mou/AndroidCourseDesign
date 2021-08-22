@@ -2,6 +2,7 @@ package com.chenjimou.androidcoursedesign.ui.fragment;
 
 import android.app.Activity;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import com.chenjimou.androidcoursedesign.databinding.FragmentHomeBinding;
 import com.chenjimou.androidcoursedesign.utils.DateUtils;
 import com.chenjimou.androidcoursedesign.utils.DecodeUtils;
 import com.chenjimou.androidcoursedesign.utils.DisplayUtils;
+import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
 import com.google.gson.Gson;
 import com.scwang.smart.refresh.footer.ClassicsFooter;
 import com.scwang.smart.refresh.header.ClassicsHeader;
@@ -61,6 +63,8 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
 
     boolean isError = false;
     int lastLoadPosition = 0;
+
+    private static final String TAG = "HomeFragment";
 
     @Override
     protected ViewBinding createViewBinding(LayoutInflater inflater, ViewGroup container)
@@ -105,7 +109,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
 
     void loadFromInternet()
     {
-        mRetrofit.create(RetrofitRequest.class).getAllSpaces("")
+        mRetrofit.create(RetrofitRequest.class).getAllSpaces(SharedPreferencesUtils.getInstance().getToken())
                 .map(new Function<GetAllSpacesModel, GetAllSpacesModel>()
                 {
                     @Override
@@ -142,8 +146,8 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                             @io.reactivex.annotations.NonNull
                                     GetAllSpacesModel getAllSpacesModel)
                     {
-                        dataOnUI.addAll(getAllSpacesModel.getData());
                         isError = false;
+                        dataOnUI.addAll(getAllSpacesModel.getData());
                     }
 
                     @Override
@@ -152,6 +156,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                                     Throwable e)
                     {
                         isError = true;
+                        e.printStackTrace();
                     }
 
                     @Override

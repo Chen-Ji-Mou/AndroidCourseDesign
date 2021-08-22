@@ -6,7 +6,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.Window;
@@ -16,12 +18,13 @@ import com.chenjimou.androidcoursedesign.databinding.ActivityMainBinding;
 import com.chenjimou.androidcoursedesign.ui.fragment.HomeFragment;
 import com.chenjimou.androidcoursedesign.ui.fragment.PersonalFragment;
 import com.chenjimou.androidcoursedesign.ui.fragment.ShareFragment;
+import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener
 {
     ActivityMainBinding mBinding;
 
@@ -45,9 +48,8 @@ public class MainActivity extends AppCompatActivity
         fragments.add(new ShareFragment());
         fragments.add(new PersonalFragment());
 
-        mBinding.viewpager.setOffscreenPageLimit(fragments.size());
         mBinding.viewpager.setAdapter(new MainPagerAdapter(this));
-        mBinding.viewpager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback()
+        mBinding.viewpager.registerOnPageChangeCallback(new OnPageChangeCallback()
         {
             @Override
             public void onPageSelected(int position)
@@ -57,28 +59,27 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        mBinding.bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
+        mBinding.bottomNavigationView.setOnNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(
+            @NonNull
+                    MenuItem item)
+    {
+        switch (item.getItemId())
         {
-            @Override
-            public boolean onNavigationItemSelected(
-                    @NonNull
-                            MenuItem item)
-            {
-                switch (item.getItemId())
-                {
-                    case R.id.item_home:
-                        mBinding.viewpager.setCurrentItem(0);
-                        break;
-                    case R.id.item_share:
-                        mBinding.viewpager.setCurrentItem(1);
-                        break;
-                    case R.id.item_personal:
-                        mBinding.viewpager.setCurrentItem(3);
-                        break;
-                }
-                return true;
-            }
-        });
+            case R.id.item_home:
+                mBinding.viewpager.setCurrentItem(0);
+                break;
+            case R.id.item_share:
+                mBinding.viewpager.setCurrentItem(1);
+                break;
+            case R.id.item_personal:
+                mBinding.viewpager.setCurrentItem(3);
+                break;
+        }
+        return true;
     }
 
     class MainPagerAdapter extends FragmentStateAdapter

@@ -6,4 +6,9 @@
     <string name="item_share">分享</string>
     <string name="item_personal">个人</string>
     <string name="tv_no_data">无数据</string>
+    <string name="et_username">请输入用户名</string>
+    <string name="et_password">请输入密码</string>
+    <string name="btn_login">登录</string>
+    <string name="btn_register">注册</string>
+    <string name="btn_register_finish">完成</string>
 </resources>

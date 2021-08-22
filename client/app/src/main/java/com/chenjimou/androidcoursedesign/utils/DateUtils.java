@@ -249,7 +249,7 @@ public class DateUtils {
      */
     public static String formatDate(long time) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String date = sdf.format(time * 1000);
+        String date = sdf.format(time);
         return date;
     }
 
