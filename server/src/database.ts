@@ -1,4 +1,5 @@
 import mysql, { Pool, PoolConfig, FieldInfo } from 'mysql'
+import { ApiError } from './model';
 
 export class MySQL {
     pool: Pool
@@ -7,12 +8,12 @@ export class MySQL {
     }
 
     async execute(sql: string): Promise<[any, FieldInfo[]]> {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             const begin = new Date().getTime();
             this.pool.query(sql, function (error, results, fields) {
                 const end = new Date().getTime();
                 console.info(`[MySQL] execute <${sql}> time: ${end - begin}ms`);
-                if (error) throw error;
+                if (error) reject("Server sql error");
                 resolve([results, fields ? fields : []])
             });
         });
