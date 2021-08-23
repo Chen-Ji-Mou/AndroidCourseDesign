@@ -15,6 +15,9 @@
         android:theme="@style/MaterialAppTheme"
         tools:targetApi="n">
         <activity
+            android:name=".ui.activity.ShareEditActivity"
+            android:theme="@style/ToolBarAppTheme" />
+        <activity
             android:name=".ui.activity.RegisterActivity"
             android:theme="@style/ImmersiveTheme" />
         <activity
@@ -23,7 +26,7 @@
             android:theme="@style/ImmersiveTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-        
+    
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

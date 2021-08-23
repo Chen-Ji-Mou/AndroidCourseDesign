@@ -54,4 +54,12 @@ dependencies {
 
     implementation  'com.scwang.smart:refresh-layout-kernel:2.0.3' // 核心必须依赖
     implementation  'com.scwang.smart:refresh-header-classics:2.0.3' // 经典刷新头
+
+    /*============================ 底部导航的依赖 ==================================*/
+
+    implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
+
+    /*============================ 系统栏设置向下兼容 ==================================*/
+
+    implementation 'com.readystatesoftware.systembartint:systembartint:1.0.3'
 }

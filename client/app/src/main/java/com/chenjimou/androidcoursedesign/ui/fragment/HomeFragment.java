@@ -105,6 +105,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     protected void initDataFirst()
     {
         loadFromInternet();
+        Log.d(TAG, "initDataFirst: ");
     }
 
     void loadFromInternet()

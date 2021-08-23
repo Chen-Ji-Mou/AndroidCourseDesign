@@ -4,9 +4,31 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Base64;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+
 public class DecodeUtils
 {
     private static final BitmapFactory.Options options = new BitmapFactory.Options();
+
+    public static String encodeByBase64(String path)
+    {
+        String result = null;
+        try
+        {
+            BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(new File(path)));
+            byte[] bytes = new byte[inputStream.available()];
+            inputStream.read(bytes);
+            inputStream.close();
+            result = Base64.encodeToString(bytes, 0, bytes.length, Base64.DEFAULT);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
     public static byte[] decodeByBase64(String source)
     {

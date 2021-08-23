@@ -5,26 +5,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.chenjimou.androidcoursedesign.R;
 import com.chenjimou.androidcoursedesign.databinding.ActivityMainBinding;
 import com.chenjimou.androidcoursedesign.ui.fragment.HomeFragment;
 import com.chenjimou.androidcoursedesign.ui.fragment.PersonalFragment;
-import com.chenjimou.androidcoursedesign.ui.fragment.ShareFragment;
-import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener
+public class MainActivity extends AppCompatActivity implements
+        BottomNavigationView.OnNavigationItemSelectedListener, View.OnClickListener
 {
     ActivityMainBinding mBinding;
 
@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         setSupportActionBar(mBinding.toolbar);
 
         fragments.add(new HomeFragment());
-        fragments.add(new ShareFragment());
         fragments.add(new PersonalFragment());
 
         mBinding.viewpager.setAdapter(new MainPagerAdapter(this));
@@ -54,12 +53,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             @Override
             public void onPageSelected(int position)
             {
+                if (position == 1)
+                    position++;
                 MenuItem item = mBinding.bottomNavigationView.getMenu().getItem(position);
                 item.setChecked(true);
             }
         });
 
+        mBinding.bottomNavigationView.enableAnimation(false);
+        mBinding.bottomNavigationView.enableShiftingMode(false);
+        mBinding.bottomNavigationView.enableItemShiftingMode(false);
+        mBinding.bottomNavigationView.setTextVisibility(false);
         mBinding.bottomNavigationView.setOnNavigationItemSelectedListener(this);
+
+        mBinding.btnShare.setOnClickListener(this);
     }
 
     @Override
@@ -73,13 +80,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 mBinding.viewpager.setCurrentItem(0);
                 break;
             case R.id.item_share:
-                mBinding.viewpager.setCurrentItem(1);
-                break;
+                return false;
             case R.id.item_personal:
-                mBinding.viewpager.setCurrentItem(3);
+                mBinding.viewpager.setCurrentItem(1);
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        startActivity(new Intent(MainActivity.this, ShareEditActivity.class));
     }
 
     class MainPagerAdapter extends FragmentStateAdapter
