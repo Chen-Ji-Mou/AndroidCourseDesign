@@ -10,13 +10,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-public class StaggeredGridItemDecoration extends RecyclerView.ItemDecoration
+public class ShareEditItemDecoration extends RecyclerView.ItemDecoration
 {
     @Override
-    public void getItemOffsets(@NonNull
-            Rect outRect, @NonNull
-            View view,
-            @NonNull RecyclerView parent, @NonNull RecyclerView.State state)
+    public void getItemOffsets(
+            @NonNull
+                    Rect outRect,
+            @NonNull
+                    View view,
+            @NonNull
+                    RecyclerView parent,
+            @NonNull
+                    RecyclerView.State state)
     {
         super.getItemOffsets(outRect, view, parent, state);
 
@@ -26,7 +31,7 @@ public class StaggeredGridItemDecoration extends RecyclerView.ItemDecoration
         int divider = DisplayUtils.dip2px(BaseApplication.sApplication,8);
 
         outRect.bottom = divider;
-        if (position == 0 || position == 1)
+        if (position == 0 || position == 1 || position == 2)
         {
             outRect.top = divider;
         }
@@ -35,8 +40,7 @@ public class StaggeredGridItemDecoration extends RecyclerView.ItemDecoration
             outRect.top = 0;
         }
 
-        // 偶数项
-        if (spanIndex % 2 == 0)
+        if (spanIndex % 3 == 0)
         {
             outRect.left = divider;
             outRect.right = divider / 2;

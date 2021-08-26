@@ -18,6 +18,7 @@ import com.chenjimou.androidcoursedesign.R;
 import com.chenjimou.androidcoursedesign.databinding.ActivityMainBinding;
 import com.chenjimou.androidcoursedesign.ui.fragment.HomeFragment;
 import com.chenjimou.androidcoursedesign.ui.fragment.PersonalFragment;
+import com.chenjimou.androidcoursedesign.utils.SystemBarUtil;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -33,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity implements
 
     void init()
     {
+        SystemBarUtil.setStatusBarColor(this, R.color.colorPrimary);
+        SystemBarUtil.setAndroidNativeLightStatusBar(this, false);
+
         setSupportActionBar(mBinding.toolbar);
 
         fragments.add(new HomeFragment());

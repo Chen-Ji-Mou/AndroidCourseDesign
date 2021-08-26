@@ -1,7 +1,6 @@
 package com.chenjimou.androidcoursedesign.ui.fragment;
 
 import android.app.Activity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +10,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.chenjimou.androidcoursedesign.R;
-import com.chenjimou.androidcoursedesign.databinding.LayoutStaggeredGridItemBinding;
+import com.chenjimou.androidcoursedesign.databinding.LayoutHomeItemBinding;
 import com.chenjimou.androidcoursedesign.inter.RetrofitRequest;
 import com.chenjimou.androidcoursedesign.model.GetAllSpacesModel;
-import com.chenjimou.androidcoursedesign.ui.StaggeredGridItemDecoration;
+import com.chenjimou.androidcoursedesign.ui.HomeItemDecoration;
 import com.chenjimou.androidcoursedesign.ui.LazyLoadFragment;
 import com.chenjimou.androidcoursedesign.databinding.FragmentHomeBinding;
 import com.chenjimou.androidcoursedesign.utils.DateUtils;
@@ -34,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.util.TimeUtils;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.viewbinding.ViewBinding;
@@ -78,7 +76,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
         mBinding = (FragmentHomeBinding) viewBinding;
 
         mBinding.recyclerview.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        mBinding.recyclerview.addItemDecoration(new StaggeredGridItemDecoration());
+        mBinding.recyclerview.addItemDecoration(new HomeItemDecoration());
 
         mAdapter = new HomeAdapter();
         mBinding.recyclerview.setAdapter(mAdapter);
@@ -208,7 +206,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
 
     class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder>
     {
-        LayoutStaggeredGridItemBinding itemBinding;
+        LayoutHomeItemBinding itemBinding;
 
         @NonNull
         @Override
@@ -216,7 +214,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                 @NonNull
                         ViewGroup parent, int viewType)
         {
-            itemBinding = LayoutStaggeredGridItemBinding.inflate(getLayoutInflater(), parent, false);
+            itemBinding = LayoutHomeItemBinding.inflate(getLayoutInflater(), parent, false);
             return new ViewHolder(itemBinding.getRoot());
         }
 

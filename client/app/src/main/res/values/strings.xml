@@ -12,4 +12,6 @@
     <string name="item_share_finish">分享</string>
     <string name="btn_share_finish">分享</string>
     <string name="et_content">添加动态内容…</string>
+    <string name="tv_add_picture">添加图片</string>
+    <string name="btn_select_finish">选择完成</string>
 </resources>

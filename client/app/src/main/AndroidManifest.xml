@@ -15,6 +15,9 @@
         android:theme="@style/MaterialAppTheme"
         tools:targetApi="n">
         <activity
+            android:name=".ui.activity.SharingImageSelectActivity"
+            android:theme="@style/ToolBarAppTheme" />
+        <activity
             android:name=".ui.activity.ShareEditActivity"
             android:theme="@style/ToolBarAppTheme" />
         <activity
@@ -32,7 +35,8 @@
         </activity>
         <activity
             android:name=".ui.activity.MainActivity"
-            android:theme="@style/ImmersiveTheme" />
+            android:theme="@style/ToolBarAppTheme"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
     </application>
 
 </manifest>
