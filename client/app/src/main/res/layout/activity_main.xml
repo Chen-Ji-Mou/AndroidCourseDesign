@@ -64,7 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:src="@drawable/icon_share_merge"
+            android:src="@drawable/bg_share"
             android:contentDescription="@string/btn_share"
             app:backgroundTint="@color/white"
             app:elevation="8dp"

@@ -64,9 +64,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/horizontal_line"
-            app:passwordToggleDrawable="@drawable/icon_eye_merge"
+            app:passwordToggleDrawable="@drawable/bg_eye"
             app:passwordToggleEnabled="true"
-            app:passwordToggleTint="@drawable/select_tint_visible"
+            app:passwordToggleTint="@drawable/bg_select_tint_visible"
             app:passwordToggleTintMode="multiply">
         
             <com.google.android.material.textfield.TextInputEditText

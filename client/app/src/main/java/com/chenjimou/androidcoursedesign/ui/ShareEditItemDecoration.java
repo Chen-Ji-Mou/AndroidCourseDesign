@@ -31,6 +31,7 @@ public class ShareEditItemDecoration extends RecyclerView.ItemDecoration
         int divider = DisplayUtils.dip2px(BaseApplication.sApplication,8);
 
         outRect.bottom = divider;
+        outRect.right = divider;
         if (position == 0 || position == 1 || position == 2)
         {
             outRect.top = divider;
@@ -43,12 +44,6 @@ public class ShareEditItemDecoration extends RecyclerView.ItemDecoration
         if (spanIndex % 3 == 0)
         {
             outRect.left = divider;
-            outRect.right = divider / 2;
-        }
-        else
-        {
-            outRect.left = divider / 2;
-            outRect.right = divider;
         }
     }
 }

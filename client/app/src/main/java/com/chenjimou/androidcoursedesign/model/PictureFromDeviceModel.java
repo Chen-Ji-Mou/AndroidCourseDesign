@@ -5,15 +5,31 @@ import android.os.Parcelable;
 
 public class PictureFromDeviceModel implements Parcelable
 {
-    private long id;
+    private int id;
     private String path;
+    private String name;
 
     public PictureFromDeviceModel() { }
 
     protected PictureFromDeviceModel(Parcel in)
     {
-        id = in.readLong();
+        id = in.readInt();
         path = in.readString();
+        name = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeInt(id);
+        dest.writeString(path);
+        dest.writeString(name);
+    }
+
+    @Override
+    public int describeContents()
+    {
+        return 0;
     }
 
     public static final Creator<PictureFromDeviceModel> CREATOR = new Creator<PictureFromDeviceModel>()
@@ -31,12 +47,12 @@ public class PictureFromDeviceModel implements Parcelable
         }
     };
 
-    public long getId()
+    public int getId()
     {
         return id;
     }
 
-    public void setId(long id)
+    public void setId(int id)
     {
         this.id = id;
     }
@@ -49,18 +65,5 @@ public class PictureFromDeviceModel implements Parcelable
     public void setPath(String path)
     {
         this.path = path;
-    }
-
-    @Override
-    public int describeContents()
-    {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags)
-    {
-        dest.writeLong(id);
-        dest.writeString(path);
     }
 }

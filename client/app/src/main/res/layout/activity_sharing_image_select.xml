@@ -35,12 +35,14 @@
     </androidx.appcompat.widget.Toolbar>
     
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/recyclerview"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+    
+    <include layout="@layout/layout_no_data" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

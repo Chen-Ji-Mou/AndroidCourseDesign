@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -109,7 +108,7 @@ public class ShareEditActivity extends AppCompatActivity
         static final int TYPE_PICTURE = 1;
 
         LayoutAddPictureBinding addPictureBinding;
-        LayoutShareEditItemBinding shareEditItemBinding;
+        LayoutShareEditItemBinding itemBinding;
 
         @Override
         public int getItemViewType(int position)
@@ -134,8 +133,8 @@ public class ShareEditActivity extends AppCompatActivity
             }
             else
             {
-                shareEditItemBinding = LayoutShareEditItemBinding.inflate(getLayoutInflater(), parent, false);
-                viewHolder = new PictureViewHolder(shareEditItemBinding.getRoot());
+                itemBinding = LayoutShareEditItemBinding.inflate(getLayoutInflater(), parent, false);
+                viewHolder = new PictureViewHolder(itemBinding.getRoot());
             }
             return viewHolder;
         }
@@ -146,12 +145,11 @@ public class ShareEditActivity extends AppCompatActivity
                         RecyclerView.ViewHolder holder, int position)
         {
             int screenWidth = DisplayUtils.getScreenWidth(ShareEditActivity.this);
-            int divider = DisplayUtils.dip2px(ShareEditActivity.this,8);
 
             StaggeredGridLayoutManager.LayoutParams layoutParams =
                     (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
-            layoutParams.height = (screenWidth - divider * 4) / 3;
-            layoutParams.width = (screenWidth - divider * 4) / 3;
+            layoutParams.height = screenWidth / 3;
+            layoutParams.width = screenWidth / 3;
             holder.itemView.setLayoutParams(layoutParams);
 
             if (getItemViewType(position) == TYPE_PICTURE)
@@ -201,13 +199,15 @@ public class ShareEditActivity extends AppCompatActivity
         class PictureViewHolder extends RecyclerView.ViewHolder
         {
             ImageView iv_picture;
+            ImageView iv_select;
 
             public PictureViewHolder(
                     @NonNull
                             View itemView)
             {
                 super(itemView);
-                iv_picture = shareEditItemBinding.ivPicture;
+                iv_picture = itemBinding.ivPicture;
+                iv_select = itemBinding.ivSelect;
             }
         }
     }

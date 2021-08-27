@@ -4,7 +4,7 @@
     <item
         android:id="@+id/item_home"
         android:title=""
-        android:icon="@drawable/icon_home_merge"
+        android:icon="@drawable/bg_home"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/item_share"
@@ -13,6 +13,6 @@
     <item
         android:id="@+id/item_personal"
         android:title=""
-        android:icon="@drawable/icon_personal_merge"
+        android:icon="@drawable/bg_personal"
         app:showAsAction="ifRoom" />
 </menu>
