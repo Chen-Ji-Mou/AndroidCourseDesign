@@ -18,7 +18,7 @@
         android:layout_marginTop="6dp"
         android:layout_marginEnd="6dp"
         android:layout_marginRight="6dp"
-        android:background="@drawable/bg_unselected"
+        android:background="@drawable/icon_unselected"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

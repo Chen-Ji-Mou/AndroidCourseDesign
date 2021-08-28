@@ -169,7 +169,7 @@ public class SharingImageSelectActivity extends AppCompatActivity implements Vie
                             Cursor result)
             {
                 isError = false;
-                if (result != null && result.moveToFirst())
+                if (result.moveToFirst())
                 {
                     int pictureIdIndex = result.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
                     int picturePathIndex = result.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
@@ -188,10 +188,7 @@ public class SharingImageSelectActivity extends AppCompatActivity implements Vie
                     }
                     while (result.moveToNext());
                 }
-                if (result != null)
-                {
-                    result.close();
-                }
+                result.close();
             }
 
             @Override
@@ -251,16 +248,16 @@ public class SharingImageSelectActivity extends AppCompatActivity implements Vie
     /**
      * 反选
      */
-    void reverseSelect(String select)
+    void reverseSelect(String path)
     {
-        if (select == null || select.isEmpty())
+        if (path == null || path.isEmpty())
         {
             return;
         }
         PictureFromDeviceModel del = null;
         for (PictureFromDeviceModel model : dataBySelect)
         {
-            if (select.equals(model.getPath()))
+            if (path.equals(model.getPath()))
             {
                 del = model;
             }
@@ -343,7 +340,7 @@ public class SharingImageSelectActivity extends AppCompatActivity implements Vie
             layoutParams.width = screenWidth / 3;
             holder.itemView.setLayoutParams(layoutParams);
 
-            holder.itemView.setVisibility(View.VISIBLE);
+            holder.iv_select.setVisibility(View.VISIBLE);
 
             Glide.with(SharingImageSelectActivity.this)
                     .load(dataOnUI.get(position).getPath())
@@ -368,12 +365,24 @@ public class SharingImageSelectActivity extends AppCompatActivity implements Vie
                 super(itemView);
                 iv_picture = itemBinding.ivPicture;
                 iv_select = itemBinding.ivSelect;
-                iv_select.setOnClickListener(new View.OnClickListener()
+                itemView.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
                     public void onClick(View v)
                     {
-
+                        int position = getAdapterPosition();
+                        PictureFromDeviceModel model = dataOnUI.get(position);
+                        if (!checkSelect(model.getPath()))
+                        {
+                            dataBySelect.add(model);
+                            iv_select.setBackgroundResource(R.drawable.icon_selected);
+                        }
+                        else
+                        {
+                            reverseSelect(model.getPath());
+                            iv_select.setBackgroundResource(R.drawable.icon_unselected);
+                        }
+                        mBinding.btnSelectFinish.setEnabled(!dataBySelect.isEmpty());
                     }
                 });
             }

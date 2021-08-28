@@ -62,8 +62,6 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     boolean isError = false;
     int lastLoadPosition = 0;
 
-    private static final String TAG = "HomeFragment";
-
     @Override
     protected ViewBinding createViewBinding(LayoutInflater inflater, ViewGroup container)
     {
@@ -103,7 +101,6 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     protected void initDataFirst()
     {
         loadFromInternet();
-        Log.d(TAG, "initDataFirst: ");
     }
 
     void loadFromInternet()

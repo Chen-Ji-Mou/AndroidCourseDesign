@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements
 
     List<Fragment> fragments = new ArrayList<>();
 
+    static final int ACTION_SHARE = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onClick(View v)
     {
-        startActivity(new Intent(MainActivity.this, ShareEditActivity.class));
+        startActivityForResult(new Intent(MainActivity.this, ShareEditActivity.class), ACTION_SHARE);
     }
 
     class MainPagerAdapter extends FragmentStateAdapter

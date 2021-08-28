@@ -5,6 +5,7 @@ import android.os.Build;
 import android.util.Base64;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -18,10 +19,17 @@ public class DecodeUtils
         try
         {
             BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(new File(path)));
-            byte[] bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
+            byte[] bytes = new byte[1024];
+            int i;
+            while ((i = inputStream.read(bytes)) != -1)
+            {
+                bos.write(bytes, 0, i);
+            }
             inputStream.close();
-            result = Base64.encodeToString(bytes, 0, bytes.length, Base64.DEFAULT);
+            byte[] data = bos.toByteArray();
+            bos.close();
+            result = Base64.encodeToString(data, 0, bytes.length, Base64.DEFAULT);
         }
         catch (Exception e)
         {
