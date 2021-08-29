@@ -7,12 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.chenjimou.androidcoursedesign.R;
 import com.chenjimou.androidcoursedesign.databinding.LayoutHomeItemBinding;
 import com.chenjimou.androidcoursedesign.inter.RetrofitRequest;
 import com.chenjimou.androidcoursedesign.model.GetAllSpacesModel;
+import com.chenjimou.androidcoursedesign.model.GetPictureModel;
 import com.chenjimou.androidcoursedesign.ui.HomeItemDecoration;
 import com.chenjimou.androidcoursedesign.ui.LazyLoadFragment;
 import com.chenjimou.androidcoursedesign.databinding.FragmentHomeBinding;
@@ -36,7 +38,10 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.viewbinding.ViewBinding;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
@@ -62,6 +67,8 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     boolean isError = false;
     int lastLoadPosition = 0;
 
+    private static final String TAG = "HomeFragment";
+
     @Override
     protected ViewBinding createViewBinding(LayoutInflater inflater, ViewGroup container)
     {
@@ -71,6 +78,8 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     @Override
     protected void init(ViewBinding viewBinding)
     {
+        Log.d(TAG, "init: ");
+
         mBinding = (FragmentHomeBinding) viewBinding;
 
         mBinding.recyclerview.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
@@ -100,81 +109,155 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     @Override
     protected void initDataFirst()
     {
+        Log.d(TAG, "initDataFirst: ");
+        reset();
         loadFromInternet();
+    }
+
+    void reset()
+    {
+        dataOnUI.clear();
+        sources.clear();
+        sourceWidths.clear();
+        sourceHeights.clear();
+        isError = false;
+        lastLoadPosition = 0;
     }
 
     void loadFromInternet()
     {
-        mRetrofit.create(RetrofitRequest.class).getAllSpaces(SharedPreferencesUtils.getInstance().getToken())
-                .map(new Function<GetAllSpacesModel, GetAllSpacesModel>()
+        mRetrofit.create(RetrofitRequest.class)
+        .getAllSpaces(SharedPreferencesUtils.getInstance().getToken())
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Observer<GetAllSpacesModel>()
+        {
+            @Override
+            public void onSubscribe(
+                    @io.reactivex.annotations.NonNull
+                            Disposable d)
+            {
+                mDisposable = d;
+            }
+
+            @Override
+            public void onNext(
+                    @io.reactivex.annotations.NonNull
+                            GetAllSpacesModel getAllSpacesModel)
+            {
+
+                isError = false;
+                dataOnUI.addAll(getAllSpacesModel.getData());
+            }
+
+            @Override
+            public void onError(
+                    @io.reactivex.annotations.NonNull
+                            Throwable e)
+            {
+                isError = true;
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete()
+            {
+                Log.d(TAG, "1. onComplete: isError "+isError);
+                if (!isError)
                 {
-                    @Override
-                    public GetAllSpacesModel apply(
-                            @io.reactivex.annotations.NonNull
-                                    GetAllSpacesModel getAllSpacesModel) throws Exception
-                    {
-                        for (GetAllSpacesModel.DataDTO dto : getAllSpacesModel.getData())
-                        {
-                            byte[] source = DecodeUtils.decodeByBase64(dto.getPictures().get(0));
-                            sources.add(source);
-
-                            int[] dimensions = DecodeUtils.getSourceDimensions(source);
-                            sourceWidths.add(dimensions[0]);
-                            sourceHeights.add(dimensions[1]);
-                        }
-                        return getAllSpacesModel;
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<GetAllSpacesModel>()
+                    dispatchLoadPicture();
+                }
+                else
                 {
-                    @Override
-                    public void onSubscribe(
-                            @io.reactivex.annotations.NonNull
-                                    Disposable d)
-                    {
-                        mDisposable = d;
-                    }
+                    Toast.makeText(getContext(), "加载失败，请重试", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
-                    @Override
-                    public void onNext(
-                            @io.reactivex.annotations.NonNull
-                                    GetAllSpacesModel getAllSpacesModel)
-                    {
-                        isError = false;
-                        dataOnUI.addAll(getAllSpacesModel.getData());
-                    }
+    void dispatchLoadPicture()
+    {
+        Observable.fromArray(dataOnUI.toArray(new GetAllSpacesModel.DataDTO[0]))
+        .concatMap(new Function<GetAllSpacesModel.DataDTO, ObservableSource<GetPictureModel>>()
+        {
+            @Override
+            public ObservableSource<GetPictureModel> apply(
+                    @io.reactivex.annotations.NonNull
+                            GetAllSpacesModel.DataDTO dataDTO) throws Exception
+            {
+                return mRetrofit.create(RetrofitRequest.class)
+                        .getPicture(SharedPreferencesUtils.getInstance().getToken(), dataDTO.getPictures().get(0));
+            }
+        })
+        .map(new Function<GetPictureModel, byte[]>()
+        {
+            @Override
+            public byte[] apply(
+                    @io.reactivex.annotations.NonNull
+                            GetPictureModel getPictureModel) throws Exception
+            {
+                byte[] source = DecodeUtils.decodeByBase64(getPictureModel.getData().getBase64());
+                sources.add(source);
+                return source;
+            }
+        })
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Observer<byte[]>()
+        {
+            @Override
+            public void onSubscribe(
+                    @io.reactivex.annotations.NonNull
+                            Disposable d)
+            {
+                mDisposable = d;
+            }
 
-                    @Override
-                    public void onError(
-                            @io.reactivex.annotations.NonNull
-                                    Throwable e)
-                    {
-                        isError = true;
-                        e.printStackTrace();
-                    }
+            @Override
+            public void onNext(
+                    @io.reactivex.annotations.NonNull
+                            byte[] source)
+            {
+                isError = false;
+                int[] dimensions = DecodeUtils.getSourceDimensions(source);
+                sourceWidths.add(dimensions[0]);
+                sourceHeights.add(dimensions[1]);
+            }
 
-                    @Override
-                    public void onComplete()
+            @Override
+            public void onError(
+                    @io.reactivex.annotations.NonNull
+                            Throwable e)
+            {
+                isError = true;
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete()
+            {
+                Log.d(TAG, "2. onComplete: isError "+isError);
+                if (!isError)
+                {
+                    if (!dataOnUI.isEmpty())
                     {
-                        if (!isError)
-                        {
-                            if(!dataOnUI.isEmpty())
-                            {
-                                mBinding.recyclerview.setVisibility(View.VISIBLE);
-                                mBinding.getRoot().findViewById(R.id.layout_no_data).setVisibility(View.GONE);
-                            }
-                            else
-                            {
-                                mBinding.recyclerview.setVisibility(View.GONE);
-                                mBinding.getRoot().findViewById(R.id.layout_no_data).setVisibility(View.VISIBLE);
-                            }
-                            mAdapter.notifyDataSetChanged();
-                            lastLoadPosition = dataOnUI.size();
-                        }
+                        mBinding.recyclerview.setVisibility(View.VISIBLE);
+                        mBinding.getRoot().findViewById(R.id.layout_no_data).setVisibility(View.GONE);
                     }
-                });
+                    else
+                    {
+                        mBinding.recyclerview.setVisibility(View.GONE);
+                        mBinding.getRoot().findViewById(R.id.layout_no_data).setVisibility(View.VISIBLE);
+                    }
+                    mAdapter.notifyDataSetChanged();
+                    lastLoadPosition = dataOnUI.size();
+                }
+                else
+                {
+                    Toast.makeText(getContext(), "加载失败，请重试", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override

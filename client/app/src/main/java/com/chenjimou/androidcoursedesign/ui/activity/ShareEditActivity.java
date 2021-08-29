@@ -67,6 +67,8 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
 
     static final int ACTION_SELECT_IMAGE = 0;
 
+    private static final String TAG = "ShareEditActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -213,6 +215,8 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View v)
     {
+        List<String> pictureIds = new ArrayList<>();
+
         Observable.fromArray(dataOnUI.toArray(new PictureFromDeviceModel[0]))
         .concatMap(new Function<PictureFromDeviceModel, ObservableSource<String>>()
         {
@@ -236,21 +240,9 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
                         .upLoadPicture(SharedPreferencesUtils.getInstance().getToken(), encode);
             }
         })
-        .map(new Function<UpLoadPictureModel, List<String>>()
-        {
-            @Override
-            public List<String> apply(
-                    @io.reactivex.annotations.NonNull
-                            UpLoadPictureModel upLoadPictureModel) throws Exception
-            {
-                List<String> pictureIds = new ArrayList<>();
-                pictureIds.add(upLoadPictureModel.getData().getId());
-                return pictureIds;
-            }
-        })
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Observer<List<String>>()
+        .subscribe(new Observer<UpLoadPictureModel>()
         {
             @Override
             public void onSubscribe(
@@ -263,10 +255,10 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onNext(
                     @io.reactivex.annotations.NonNull
-                            List<String> pictureIds)
+                            UpLoadPictureModel upLoadPictureModel)
             {
                 isError = false;
-                dispatchPostSpace(pictureIds);
+                pictureIds.add(upLoadPictureModel.getData().getId());
             }
 
             @Override
@@ -281,7 +273,14 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onComplete()
             {
-
+                if (!isError)
+                {
+                    dispatchPostSpace(pictureIds);
+                }
+                else
+                {
+                    Toast.makeText(ShareEditActivity.this, "发布失败，请重试", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

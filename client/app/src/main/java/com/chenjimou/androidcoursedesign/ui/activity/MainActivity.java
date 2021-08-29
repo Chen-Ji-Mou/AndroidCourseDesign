@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements
         fragments.add(new HomeFragment());
         fragments.add(new PersonalFragment());
 
+        mBinding.viewpager.setUserInputEnabled(false);
         mBinding.viewpager.setAdapter(new MainPagerAdapter(this));
         mBinding.viewpager.registerOnPageChangeCallback(new OnPageChangeCallback()
         {

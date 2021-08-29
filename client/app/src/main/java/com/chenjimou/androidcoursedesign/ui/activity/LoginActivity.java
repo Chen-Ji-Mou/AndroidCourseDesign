@@ -157,6 +157,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
                                     LoginModel loginModel)
                     {
                         isError = false;
+                        Log.d(TAG, "onNext: token "+loginModel.getData());
                         SharedPreferencesUtils.getInstance().saveToken("Bearer " + loginModel.getData());
                         SharedPreferencesUtils.getInstance().saveUsername(mBinding.etUsername.getText().toString());
                         SharedPreferencesUtils.getInstance().savePassword(mBinding.etPassword.getText().toString());

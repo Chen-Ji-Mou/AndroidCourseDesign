@@ -15,21 +15,16 @@ public class DecodeUtils
 
     public static String encodeByBase64(String path)
     {
+        File file = new File(path);
         String result = null;
         try
         {
-            BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(new File(path)));
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
-            byte[] bytes = new byte[1024];
-            int i;
-            while ((i = inputStream.read(bytes)) != -1)
-            {
-                bos.write(bytes, 0, i);
-            }
+            FileInputStream inputStream = new FileInputStream(file);
+            byte[] buffer = new byte[inputStream.available()];
+            inputStream.read(buffer);
             inputStream.close();
-            byte[] data = bos.toByteArray();
-            bos.close();
-            result = Base64.encodeToString(data, 0, bytes.length, Base64.DEFAULT);
+            String encode = Base64.encodeToString(buffer, Base64.DEFAULT);
+            result = encode.replaceAll("[\n]", "");
         }
         catch (Exception e)
         {
