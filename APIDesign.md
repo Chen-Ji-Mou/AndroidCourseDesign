@@ -245,17 +245,16 @@ POST: /api/picture（带token）
 
 ```json
 {
-    "base64":"<string>"
+    "file":"<图片的文件>"
 }
 ```
 
-现在先暂时返回 base64 ，返回的响应数据为：
+返回的响应数据为：
 
 ```json
 {
     "data":{
         "id":"<string>",     // 图片的id
-        "base64":"<string>"  // 图片的base64
     },
     "code":"0",
     "msg":"success"
@@ -266,17 +265,8 @@ POST: /api/picture（带token）
 
 GET：/api/picture/:id（带token，注意这里有一个参数`id`）
 
-现在先暂时返回 base64 ，返回的响应数据为：
-```json
-{
-    "data":{
-        "id":"<string>",     // 图片的id
-        "base64":"<string>"  // 图片的base64
-    },
-    "code":"0",
-    "msg":"success"
-}
-```
+直接返回这个图片
+
 
 ## 评论（comment）
 
