@@ -1,6 +1,6 @@
 import { JsonWebTokenError } from 'jsonwebtoken';
 import Koa from 'koa';
-import bodyParser from 'koa-bodyparser';
+import koaBody from 'koa-body';
 import { router } from './controller';
 import { ResultUtil } from 'ningx';
 import { ApiError } from './model';
@@ -47,7 +47,12 @@ app.use(async (ctx, next) => {
     }
 })
 
-app.use(bodyParser());
+app.use(koaBody({
+    multipart: true,
+    formidable: {
+        maxFileSize: 2000*1024*1024    // 设置上传文件大小最大限制，20M
+    }
+}));
 
 app.use(router.routes());
 
