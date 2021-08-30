@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MaterialAppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    
+    <style name="ImmersiveTheme" parent="MaterialAppTheme">
+        <item name="windowNoTitle">true</item>
+    </style>
+    
+    <style name="ToolBarAppTheme" parent="MaterialAppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!-- 设置文字颜色的-->
+        <item name="android:textColorPrimary">@color/white</item>
+        <!-- 设置文字大小的-->
+        <item name="android:textSize">14sp</item>
+        <!-- 设置navigationIcon和Title的距离问题 -->
+        <item name="toolbarStyle">@style/NoSpaceActionBarTheme</item>
+    </style>
+    
+    <style name="NoSpaceActionBarTheme" parent="Base.Widget.AppCompat.Toolbar">
+        <item name="contentInsetStart">0dp</item>
+        <item name="contentInsetStartWithNavigation">0dp</item>
+    </style>
+</resources>

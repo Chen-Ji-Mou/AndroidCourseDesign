@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">AndroidCourseDesign</string>
+    <string name="baseUrl">https://android.therainisme.com</string>
+    
+    <string name="btn_share">分享</string>
+    <string name="tv_no_data">无数据</string>
+    <string name="et_username">请输入用户名</string>
+    <string name="et_password">请输入密码</string>
+    <string name="btn_login">登录</string>
+    <string name="btn_register">注册</string>
+    <string name="btn_register_finish">完成</string>
+    <string name="item_share_finish">分享</string>
+    <string name="btn_share_finish">分享</string>
+    <string name="et_content">添加动态内容…</string>
+    <string name="tv_add_picture">添加图片</string>
+    <string name="btn_select_finish">选择完成</string>
+</resources>
