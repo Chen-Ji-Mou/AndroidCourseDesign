@@ -6,15 +6,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -22,10 +23,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,12 +42,13 @@ import com.chenjimou.androidcoursedesign.model.PictureFromDeviceModel;
 import com.chenjimou.androidcoursedesign.model.PostSpaceModel;
 import com.chenjimou.androidcoursedesign.model.UpLoadPictureModel;
 import com.chenjimou.androidcoursedesign.ui.ShareEditItemDecoration;
-import com.chenjimou.androidcoursedesign.utils.DecodeUtils;
 import com.chenjimou.androidcoursedesign.utils.DisplayUtils;
 import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
 import com.chenjimou.androidcoursedesign.utils.SystemBarUtil;
+import com.chenjimou.androidcoursedesign.widget.LoadAnimationDialog;
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -60,6 +60,7 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
     InputMethodManager mManager;
     Retrofit mRetrofit;
     Disposable mDisposable;
+    LoadAnimationDialog mDialog;
 
     final List<PictureFromDeviceModel> dataOnUI = new ArrayList<>();
 
@@ -85,6 +86,8 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
 
         mManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
+        mDialog = LoadAnimationDialog.init(this, "发布中，请稍后...");
+
         mBinding.toolbar.setTitle("");
         setSupportActionBar(mBinding.toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -102,7 +105,7 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
         mBinding.btnShareFinish.setOnClickListener(this);
 
         mRetrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
+                .baseUrl(getString(R.string.base_url))
                 .client(new OkHttpClient.Builder()
                         .callTimeout(60, TimeUnit.SECONDS)
                         .connectTimeout(10, TimeUnit.SECONDS)
@@ -178,6 +181,7 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
                 {
                     Toast.makeText(ShareEditActivity.this, "发布失败，请重试", Toast.LENGTH_SHORT).show();
                 }
+                mDialog.dismiss();
             }
         });
     }
@@ -218,26 +222,18 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
         List<String> pictureIds = new ArrayList<>();
 
         Observable.fromArray(dataOnUI.toArray(new PictureFromDeviceModel[0]))
-        .concatMap(new Function<PictureFromDeviceModel, ObservableSource<String>>()
-        {
-            @Override
-            public ObservableSource<String> apply(
-                    @io.reactivex.annotations.NonNull
-                            PictureFromDeviceModel pictureFromDeviceModel) throws Exception
-            {
-                String encode = DecodeUtils.encodeByBase64(pictureFromDeviceModel.getPath());
-                return Observable.just(encode);
-            }
-        })
-        .concatMap(new Function<String, ObservableSource<UpLoadPictureModel>>()
+        .concatMap(new Function<PictureFromDeviceModel, ObservableSource<UpLoadPictureModel>>()
         {
             @Override
             public ObservableSource<UpLoadPictureModel> apply(
                     @io.reactivex.annotations.NonNull
-                            String encode) throws Exception
+                            PictureFromDeviceModel pictureFromDeviceModel) throws Exception
             {
+                File file = new File(pictureFromDeviceModel.getPath());
+                RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), file);
+                MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
                 return mRetrofit.create(RetrofitRequest.class)
-                        .upLoadPicture(SharedPreferencesUtils.getInstance().getToken(), encode);
+                        .upLoadPicture(SharedPreferencesUtils.getInstance().getToken(), part);
             }
         })
         .subscribeOn(Schedulers.io())
@@ -250,6 +246,7 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
                             Disposable d)
             {
                 mDisposable = d;
+                mDialog.show();
             }
 
             @Override
@@ -280,6 +277,7 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
                 else
                 {
                     Toast.makeText(ShareEditActivity.this, "发布失败，请重试", Toast.LENGTH_SHORT).show();
+                    mDialog.dismiss();
                 }
             }
         });

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">AndroidCourseDesign</string>
-    <string name="baseUrl">https://android.therainisme.com</string>
+    <string name="base_url">https://android.therainisme.com</string>
+    <string name="request_picture_url">https://android.therainisme.com/api/picture/</string>
     
     <string name="btn_share">分享</string>
     <string name="tv_no_data">无数据</string>

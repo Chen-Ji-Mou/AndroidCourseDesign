@@ -10,11 +10,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.chenjimou.androidcoursedesign.R;
 import com.chenjimou.androidcoursedesign.databinding.LayoutHomeItemBinding;
 import com.chenjimou.androidcoursedesign.inter.RetrofitRequest;
 import com.chenjimou.androidcoursedesign.model.GetAllSpacesModel;
-import com.chenjimou.androidcoursedesign.model.GetPictureModel;
 import com.chenjimou.androidcoursedesign.ui.HomeItemDecoration;
 import com.chenjimou.androidcoursedesign.ui.LazyLoadFragment;
 import com.chenjimou.androidcoursedesign.databinding.FragmentHomeBinding;
@@ -22,6 +23,7 @@ import com.chenjimou.androidcoursedesign.utils.DateUtils;
 import com.chenjimou.androidcoursedesign.utils.DecodeUtils;
 import com.chenjimou.androidcoursedesign.utils.DisplayUtils;
 import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
+import com.chenjimou.androidcoursedesign.widget.LoadAnimationDialog;
 import com.google.gson.Gson;
 import com.scwang.smart.refresh.footer.ClassicsFooter;
 import com.scwang.smart.refresh.header.ClassicsHeader;
@@ -35,18 +37,19 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -57,17 +60,15 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     Disposable mDisposable;
     Retrofit mRetrofit;
     HomeAdapter mAdapter;
+    LoadAnimationDialog mDialog;
 
     final List<GetAllSpacesModel.DataDTO> dataOnUI = new ArrayList<>();
 
-    final List<byte[]> sources = new ArrayList<>();
     final List<Integer> sourceWidths = new ArrayList<>();
     final List<Integer> sourceHeights = new ArrayList<>();
 
     boolean isError = false;
     int lastLoadPosition = 0;
-
-    private static final String TAG = "HomeFragment";
 
     @Override
     protected ViewBinding createViewBinding(LayoutInflater inflater, ViewGroup container)
@@ -78,9 +79,9 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     @Override
     protected void init(ViewBinding viewBinding)
     {
-        Log.d(TAG, "init: ");
-
         mBinding = (FragmentHomeBinding) viewBinding;
+
+        mDialog = LoadAnimationDialog.init(getContext(), "加载中，请稍后...");
 
         mBinding.recyclerview.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         mBinding.recyclerview.addItemDecoration(new HomeItemDecoration());
@@ -89,7 +90,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
         mBinding.recyclerview.setAdapter(mAdapter);
 
         mRetrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
+                .baseUrl(getString(R.string.base_url))
                 .client(new OkHttpClient.Builder()
                         .callTimeout(60, TimeUnit.SECONDS)
                         .connectTimeout(10, TimeUnit.SECONDS)
@@ -109,7 +110,6 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     @Override
     protected void initDataFirst()
     {
-        Log.d(TAG, "initDataFirst: ");
         reset();
         loadFromInternet();
     }
@@ -117,7 +117,6 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     void reset()
     {
         dataOnUI.clear();
-        sources.clear();
         sourceWidths.clear();
         sourceHeights.clear();
         isError = false;
@@ -138,6 +137,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                             Disposable d)
             {
                 mDisposable = d;
+                mDialog.show();
             }
 
             @Override
@@ -162,7 +162,6 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
             @Override
             public void onComplete()
             {
-                Log.d(TAG, "1. onComplete: isError "+isError);
                 if (!isError)
                 {
                     dispatchLoadPicture();
@@ -170,6 +169,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                 else
                 {
                     Toast.makeText(getContext(), "加载失败，请重试", Toast.LENGTH_SHORT).show();
+                    mDialog.dismiss();
                 }
             }
         });
@@ -178,10 +178,10 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     void dispatchLoadPicture()
     {
         Observable.fromArray(dataOnUI.toArray(new GetAllSpacesModel.DataDTO[0]))
-        .concatMap(new Function<GetAllSpacesModel.DataDTO, ObservableSource<GetPictureModel>>()
+        .concatMap(new Function<GetAllSpacesModel.DataDTO, ObservableSource<ResponseBody>>()
         {
             @Override
-            public ObservableSource<GetPictureModel> apply(
+            public ObservableSource<ResponseBody> apply(
                     @io.reactivex.annotations.NonNull
                             GetAllSpacesModel.DataDTO dataDTO) throws Exception
             {
@@ -189,16 +189,14 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                         .getPicture(SharedPreferencesUtils.getInstance().getToken(), dataDTO.getPictures().get(0));
             }
         })
-        .map(new Function<GetPictureModel, byte[]>()
+        .map(new Function<ResponseBody, byte[]>()
         {
             @Override
             public byte[] apply(
                     @io.reactivex.annotations.NonNull
-                            GetPictureModel getPictureModel) throws Exception
+                            ResponseBody responseBody) throws Exception
             {
-                byte[] source = DecodeUtils.decodeByBase64(getPictureModel.getData().getBase64());
-                sources.add(source);
-                return source;
+                return responseBody.bytes();
             }
         })
         .subscribeOn(Schedulers.io())
@@ -236,7 +234,6 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
             @Override
             public void onComplete()
             {
-                Log.d(TAG, "2. onComplete: isError "+isError);
                 if (!isError)
                 {
                     if (!dataOnUI.isEmpty())
@@ -256,6 +253,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                 {
                     Toast.makeText(getContext(), "加载失败，请重试", Toast.LENGTH_SHORT).show();
                 }
+                mDialog.dismiss();
             }
         });
     }
@@ -304,16 +302,22 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                         HomeAdapter.ViewHolder holder, int position)
         {
             int screenWidth = DisplayUtils.getScreenWidth((Activity)getContext());
-            int imageWidth = (screenWidth - DisplayUtils.dip2px(getContext(), 24)) / 2;
-            int imageHeight = (int) (imageWidth * (1.0f * sourceWidths.get(position) / sourceHeights.get(position)));
+            int imageWidth = screenWidth / 2;
+            int imageHeight = (int) (imageWidth / (1.0f * sourceWidths.get(position) / sourceHeights.get(position)));
 
-            StaggeredGridLayoutManager.LayoutParams layoutParams =
-                    (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
+            ConstraintLayout.LayoutParams layoutParams =
+                    (ConstraintLayout.LayoutParams) holder.iv_picture.getLayoutParams();
             layoutParams.height = imageHeight;
-            holder.itemView.setLayoutParams(layoutParams);
+            holder.iv_picture.setLayoutParams(layoutParams);
+
+            GlideUrl url = new GlideUrl(
+                    getString(R.string.request_picture_url) + dataOnUI.get(position).getPictures().get(0),
+                    new LazyHeaders.Builder()
+                            .addHeader("Authorization", SharedPreferencesUtils.getInstance().getToken())
+                            .build());
 
             Glide.with(getContext())
-                    .load(sources.get(position))
+                    .load(url)
 //                    .placeholder(R.drawable.ic_loading)
                     .override(imageWidth, imageHeight)
                     .into(holder.iv_picture);

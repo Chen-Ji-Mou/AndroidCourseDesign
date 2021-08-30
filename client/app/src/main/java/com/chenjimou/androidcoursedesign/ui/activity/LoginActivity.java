@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
         mBinding.btnRegister.setOnClickListener(this);
 
         mRetrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.baseUrl))
+                .baseUrl(getString(R.string.base_url))
                 .client(new OkHttpClient.Builder()
                         .callTimeout(60, TimeUnit.SECONDS)
                         .connectTimeout(10, TimeUnit.SECONDS)

@@ -9,7 +9,6 @@ import com.chenjimou.androidcoursedesign.model.GetStarCountModel;
 import com.chenjimou.androidcoursedesign.model.GetAllSpacesModel;
 import com.chenjimou.androidcoursedesign.model.LoginModel;
 import com.chenjimou.androidcoursedesign.model.AddNewCommentModel;
-import com.chenjimou.androidcoursedesign.model.GetPictureModel;
 import com.chenjimou.androidcoursedesign.model.PostSpaceModel;
 import com.chenjimou.androidcoursedesign.model.PostStarModel;
 import com.chenjimou.androidcoursedesign.model.ReadNoticeModel;
@@ -20,12 +19,16 @@ import com.chenjimou.androidcoursedesign.model.UpLoadPictureModel;
 import java.util.List;
 
 import io.reactivex.Observable;
+import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -101,11 +104,11 @@ public interface RetrofitRequest
     /**
      * 上传一张图片
      * @param token 令牌
-     * @param base64 图片的base64编码字符串
+     * @param file 图片文件
      */
     @POST("/api/picture")
-    @FormUrlEncoded
-    Observable<UpLoadPictureModel> upLoadPicture(@Header("Authorization") String token, @Field("base64") String base64);
+    @Multipart
+    Observable<UpLoadPictureModel> upLoadPicture(@Header("Authorization") String token, @Part MultipartBody.Part file);
 
     /**
      * 获取一张图片
@@ -113,7 +116,7 @@ public interface RetrofitRequest
      * @param pictureId 图片id
      */
     @GET("/api/picture/{id}")
-    Observable<GetPictureModel> getPicture(@Header("Authorization") String token, @Path("id") String pictureId);
+    Observable<ResponseBody> getPicture(@Header("Authorization") String token, @Path("id") String pictureId);
 
     /* ======================================== comment =================================================== */
 
