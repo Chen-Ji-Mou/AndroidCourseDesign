@@ -15,4 +15,7 @@
     <string name="et_content">添加动态内容…</string>
     <string name="tv_add_picture">添加图片</string>
     <string name="btn_select_finish">选择完成</string>
+    <string name="tv_search">搜索</string>
+    <string name="tv_user_name">用户名</string>
+    <string name="tv_autograph">写个签名介绍下自己吧</string>
 </resources>

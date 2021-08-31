@@ -9,6 +9,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements
 
     static final int ACTION_SHARE = 0;
 
+    private static final String TAG = "MainActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -47,24 +50,11 @@ public class MainActivity extends AppCompatActivity implements
         SystemBarUtil.setStatusBarColor(this, R.color.colorPrimary);
         SystemBarUtil.setAndroidNativeLightStatusBar(this, false);
 
-        setSupportActionBar(mBinding.toolbar);
-
         fragments.add(new HomeFragment());
         fragments.add(new PersonalFragment());
 
         mBinding.viewpager.setUserInputEnabled(false);
         mBinding.viewpager.setAdapter(new MainPagerAdapter(this));
-        mBinding.viewpager.registerOnPageChangeCallback(new OnPageChangeCallback()
-        {
-            @Override
-            public void onPageSelected(int position)
-            {
-                if (position == 1)
-                    position++;
-                MenuItem item = mBinding.bottomNavigationView.getMenu().getItem(position);
-                item.setChecked(true);
-            }
-        });
 
         mBinding.bottomNavigationView.enableAnimation(false);
         mBinding.bottomNavigationView.enableShiftingMode(false);
@@ -97,7 +87,12 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onClick(View v)
     {
-        startActivityForResult(new Intent(MainActivity.this, ShareEditActivity.class), ACTION_SHARE);
+        switch (v.getId())
+        {
+            case R.id.btn_share:
+                startActivityForResult(new Intent(MainActivity.this, ShareEditActivity.class), ACTION_SHARE);
+                break;
+        }
     }
 
     class MainPagerAdapter extends FragmentStateAdapter

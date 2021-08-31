@@ -54,7 +54,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class HomeFragment extends LazyLoadFragment implements OnRefreshListener, OnLoadMoreListener
+public class HomeFragment extends LazyLoadFragment implements OnRefreshListener, OnLoadMoreListener, View.OnClickListener
 {
     FragmentHomeBinding mBinding;
     Disposable mDisposable;
@@ -105,6 +105,8 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
         mBinding.smartRefreshLayout.setRefreshHeader(new ClassicsHeader(getContext()));
         mBinding.smartRefreshLayout.setOnRefreshListener(this);
         mBinding.smartRefreshLayout.setOnLoadMoreListener(this);
+
+        mBinding.btnSearch.setOnClickListener(this);
     }
 
     @Override
@@ -280,6 +282,12 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                     RefreshLayout refreshLayout)
     {
 
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        Toast.makeText(getContext(), "进入搜索页面", Toast.LENGTH_SHORT).show();
     }
 
     class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder>

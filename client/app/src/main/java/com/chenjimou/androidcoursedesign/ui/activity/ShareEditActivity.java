@@ -35,7 +35,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.chenjimou.androidcoursedesign.R;
 import com.chenjimou.androidcoursedesign.databinding.ActivityShareEditBinding;
-import com.chenjimou.androidcoursedesign.databinding.LayoutAddPictureBinding;
+import com.chenjimou.androidcoursedesign.databinding.LayoutAddPictureItemBinding;
 import com.chenjimou.androidcoursedesign.databinding.LayoutShareEditItemBinding;
 import com.chenjimou.androidcoursedesign.inter.RetrofitRequest;
 import com.chenjimou.androidcoursedesign.model.PictureFromDeviceModel;
@@ -306,7 +306,7 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
         static final int TYPE_ADD = 0;
         static final int TYPE_PICTURE = 1;
 
-        LayoutAddPictureBinding addPictureBinding;
+        LayoutAddPictureItemBinding addPictureBinding;
         LayoutShareEditItemBinding itemBinding;
 
         @Override
@@ -327,7 +327,7 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
             RecyclerView.ViewHolder viewHolder;
             if (viewType == TYPE_ADD)
             {
-                addPictureBinding = LayoutAddPictureBinding.inflate(getLayoutInflater(), parent, false);
+                addPictureBinding = LayoutAddPictureItemBinding.inflate(getLayoutInflater(), parent, false);
                 viewHolder = new AddPictureViewHolder(addPictureBinding.getRoot());
             }
             else

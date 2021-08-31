@@ -4,13 +4,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import com.chenjimou.androidcoursedesign.databinding.FragmentHomeBinding;
 import com.chenjimou.androidcoursedesign.ui.LazyLoadFragment;
 import com.chenjimou.androidcoursedesign.databinding.FragmentPersonalBinding;
+import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
 
 import androidx.viewbinding.ViewBinding;
 
 public class PersonalFragment extends LazyLoadFragment
 {
+    FragmentPersonalBinding mBinding;
+
     private static final String TAG = "PersonalFragment";
 
     @Override
@@ -22,12 +26,12 @@ public class PersonalFragment extends LazyLoadFragment
     @Override
     protected void init(ViewBinding viewBinding)
     {
-
+        mBinding = (FragmentPersonalBinding) viewBinding;
     }
 
     @Override
     protected void initDataFirst()
     {
-        Log.d(TAG, "initDataFirst: ");
+        mBinding.tvUserName.setText(SharedPreferencesUtils.getInstance().getUsername());
     }
 }
