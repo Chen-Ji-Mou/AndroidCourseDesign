@@ -4,7 +4,7 @@
     package="com.chenjimou.androidcoursedesign">
     
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     
     <application
         android:name=".base.BaseApplication"
@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/MaterialAppTheme"
         tools:targetApi="n">
+        <activity
+            android:name=".ui.activity.SpaceDetailActivity"
+            android:theme="@style/ToolBarAppTheme" />
         <activity
             android:name=".ui.activity.SharingImageSelectActivity"
             android:theme="@style/ToolBarAppTheme" />

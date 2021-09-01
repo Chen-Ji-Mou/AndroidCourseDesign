@@ -1,7 +1,7 @@
 package com.chenjimou.androidcoursedesign.ui.fragment;
 
 import android.app.Activity;
-import android.util.Log;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +16,12 @@ import com.chenjimou.androidcoursedesign.R;
 import com.chenjimou.androidcoursedesign.databinding.LayoutHomeItemBinding;
 import com.chenjimou.androidcoursedesign.inter.RetrofitRequest;
 import com.chenjimou.androidcoursedesign.model.GetAllSpacesModel;
+import com.chenjimou.androidcoursedesign.model.GetStarCountModel;
+import com.chenjimou.androidcoursedesign.model.PostStarModel;
 import com.chenjimou.androidcoursedesign.ui.HomeItemDecoration;
 import com.chenjimou.androidcoursedesign.ui.LazyLoadFragment;
 import com.chenjimou.androidcoursedesign.databinding.FragmentHomeBinding;
+import com.chenjimou.androidcoursedesign.ui.activity.SpaceDetailActivity;
 import com.chenjimou.androidcoursedesign.utils.DateUtils;
 import com.chenjimou.androidcoursedesign.utils.DecodeUtils;
 import com.chenjimou.androidcoursedesign.utils.DisplayUtils;
@@ -36,7 +39,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -66,6 +68,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
 
     final List<Integer> sourceWidths = new ArrayList<>();
     final List<Integer> sourceHeights = new ArrayList<>();
+    final List<Integer> collectionCounts = new ArrayList<>();
 
     boolean isError = false;
     int lastLoadPosition = 0;
@@ -121,6 +124,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
         dataOnUI.clear();
         sourceWidths.clear();
         sourceHeights.clear();
+        collectionCounts.clear();
         isError = false;
         lastLoadPosition = 0;
     }
@@ -166,7 +170,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
             {
                 if (!isError)
                 {
-                    dispatchLoadPicture();
+                    loadCounts();
                 }
                 else
                 {
@@ -177,7 +181,67 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
         });
     }
 
-    void dispatchLoadPicture()
+    void loadCounts()
+    {
+        Observable.fromArray(dataOnUI.toArray(new GetAllSpacesModel.DataDTO[0]))
+        .concatMap(new Function<GetAllSpacesModel.DataDTO, ObservableSource<GetStarCountModel>>()
+        {
+            @Override
+            public ObservableSource<GetStarCountModel> apply(
+                    @io.reactivex.annotations.NonNull
+                            GetAllSpacesModel.DataDTO dataDTO) throws Exception
+            {
+                return mRetrofit.create(RetrofitRequest.class)
+                        .getStarCount(SharedPreferencesUtils.getInstance().getToken(), dataDTO.getId());
+            }
+        })
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Observer<GetStarCountModel>()
+        {
+            @Override
+            public void onSubscribe(
+                    @io.reactivex.annotations.NonNull
+                            Disposable d)
+            {
+                mDisposable = d;
+            }
+
+            @Override
+            public void onNext(
+                    @io.reactivex.annotations.NonNull
+                            GetStarCountModel getStarCountModel)
+            {
+                isError = false;
+                collectionCounts.add(getStarCountModel.getData().getCount());
+            }
+
+            @Override
+            public void onError(
+                    @io.reactivex.annotations.NonNull
+                            Throwable e)
+            {
+                isError = true;
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete()
+            {
+                if (!isError)
+                {
+                    loadPictures();
+                }
+                else
+                {
+                    Toast.makeText(getContext(), "加载失败，请重试", Toast.LENGTH_SHORT).show();
+                    mDialog.dismiss();
+                }
+            }
+        });
+    }
+
+    void loadPictures()
     {
         Observable.fromArray(dataOnUI.toArray(new GetAllSpacesModel.DataDTO[0]))
         .concatMap(new Function<GetAllSpacesModel.DataDTO, ObservableSource<ResponseBody>>()
@@ -334,6 +398,8 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
 
             String date = DateUtils.formatDate(dataOnUI.get(position).getDate());
             holder.tv_date.setText(date);
+
+            holder.tv_collection_count.setText(Integer.toString(collectionCounts.get(position)));
         }
 
         @Override
@@ -344,20 +410,91 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
 
         public class ViewHolder extends RecyclerView.ViewHolder
         {
-            CardView cv_item;
             ImageView iv_picture;
             TextView tv_content;
             TextView tv_date;
+            ImageView iv_collection;
+            TextView tv_collection_count;
 
             public ViewHolder(
                     @NonNull
                             View itemView)
             {
                 super(itemView);
-                cv_item = itemBinding.cvItem;
                 iv_picture = itemBinding.ivPicture;
                 tv_content = itemBinding.tvContent;
                 tv_date = itemBinding.tvDate;
+                iv_collection = itemBinding.ivCollection;
+                tv_collection_count = itemBinding.tvCollectionCount;
+
+                itemView.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        startActivity(new Intent(getContext(), SpaceDetailActivity.class));
+                    }
+                });
+
+                iv_collection.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        int position = getLayoutPosition();
+
+                        if (dataOnUI.get(position).isCollection())
+                            return;
+
+                        mRetrofit.create(RetrofitRequest.class)
+                        .postStar(SharedPreferencesUtils.getInstance().getToken(), dataOnUI.get(position).getId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<PostStarModel>()
+                        {
+                            @Override
+                            public void onSubscribe(
+                                    @io.reactivex.annotations.NonNull
+                                            Disposable d)
+                            {
+                                mDisposable = d;
+                            }
+
+                            @Override
+                            public void onNext(
+                                    @io.reactivex.annotations.NonNull
+                                            PostStarModel postStarModel)
+                            {
+                                isError = false;
+                            }
+
+                            @Override
+                            public void onError(
+                                    @io.reactivex.annotations.NonNull
+                                            Throwable e)
+                            {
+                                isError = true;
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onComplete()
+                            {
+                                if (!isError)
+                                {
+                                    dataOnUI.get(position).setCollection(true);
+                                    iv_collection.setBackgroundResource(R.drawable.icon_favorite);
+                                    int count = collectionCounts.get(position);
+                                    tv_collection_count.setText(Integer.toString(++count));
+                                }
+                                else
+                                {
+                                    Toast.makeText(getContext(), "点赞失败，请重试", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                });
             }
         }
     }

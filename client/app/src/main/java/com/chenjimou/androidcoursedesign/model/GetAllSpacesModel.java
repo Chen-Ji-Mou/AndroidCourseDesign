@@ -59,6 +59,7 @@ public class GetAllSpacesModel implements Serializable
         private String userId;
         @JsonProperty("pictures")
         private List<String> pictures;
+        private boolean isCollection;
 
         public String getId()
         {
@@ -108,6 +109,16 @@ public class GetAllSpacesModel implements Serializable
         public void setPictures(List<String> pictures)
         {
             this.pictures = pictures;
+        }
+
+        public boolean isCollection()
+        {
+            return isCollection;
+        }
+
+        public void setCollection(boolean collection)
+        {
+            isCollection = collection;
         }
     }
 }

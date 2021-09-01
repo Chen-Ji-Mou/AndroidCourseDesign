@@ -153,11 +153,11 @@ public interface RetrofitRequest
     /**
      * 点赞一个动态
      * @param token 令牌
-     * @param userId 点赞的用户id
+     * @param spaceId 动态id
      */
     @POST("/api/star")
     @FormUrlEncoded
-    Observable<PostStarModel> postStar(@Header("Authorization") String token, @Field("postId") String userId);
+    Observable<PostStarModel> postStar(@Header("Authorization") String token, @Field("postId") String spaceId);
 
     /**
      * 查看一个动态下的所有点赞数
