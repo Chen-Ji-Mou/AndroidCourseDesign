@@ -17,4 +17,10 @@ public class DisplayUtils
         WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         return wm.getDefaultDisplay().getWidth();
     }
+
+    public static int getScreenHeight(Activity activity)
+    {
+        WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        return wm.getDefaultDisplay().getHeight();
+    }
 }

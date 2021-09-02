@@ -17,7 +17,7 @@
         tools:targetApi="n">
         <activity
             android:name=".ui.activity.SpaceDetailActivity"
-            android:theme="@style/ToolBarAppTheme" />
+            android:theme="@style/ImmersiveTheme" />
         <activity
             android:name=".ui.activity.SharingImageSelectActivity"
             android:theme="@style/ToolBarAppTheme" />

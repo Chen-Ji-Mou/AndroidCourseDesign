@@ -19,4 +19,8 @@
     <string name="tv_user_name">用户名</string>
     <string name="tv_autograph">写个签名介绍下自己吧</string>
     <string name="tv_collection_count">666</string>
+    <string name="tv_favorite_count">666</string>
+    <string name="tv_content">abcdefghijklmnopqrstuvwxyz</string>
+    <string name="tv_comment_count">共30条评论</string>
+    <string name="tv_comment_title">评论区</string>
 </resources>
