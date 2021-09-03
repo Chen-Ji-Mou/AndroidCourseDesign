@@ -1,10 +1,8 @@
 package com.chenjimou.androidcoursedesign.ui.fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.chenjimou.androidcoursedesign.databinding.FragmentHomeBinding;
 import com.chenjimou.androidcoursedesign.ui.LazyLoadFragment;
 import com.chenjimou.androidcoursedesign.databinding.FragmentPersonalBinding;
 import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;

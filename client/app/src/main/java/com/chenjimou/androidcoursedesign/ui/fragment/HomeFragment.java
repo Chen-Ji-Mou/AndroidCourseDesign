@@ -2,6 +2,7 @@ package com.chenjimou.androidcoursedesign.ui.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -324,6 +325,12 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
         });
     }
 
+    public void onLoadLatest()
+    {
+        reset();
+        loadFromInternet();
+    }
+
     @Override
     public void onStop()
     {
@@ -432,7 +439,14 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                     @Override
                     public void onClick(View v)
                     {
-                        startActivity(new Intent(getContext(), SpaceDetailActivity.class));
+                        int position = getLayoutPosition();
+                        Intent intent = new Intent(getContext(), SpaceDetailActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putStringArrayList("pictures", (ArrayList<String>) dataOnUI.get(position).getPictures());
+                        bundle.putString("content", dataOnUI.get(position).getContent());
+                        bundle.putLong("date", dataOnUI.get(position).getDate());
+                        intent.putExtras(bundle);
+                        startActivity(intent);
                     }
                 });
 

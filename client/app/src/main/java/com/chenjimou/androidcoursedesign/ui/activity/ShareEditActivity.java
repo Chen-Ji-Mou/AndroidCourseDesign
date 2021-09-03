@@ -203,17 +203,20 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
                     Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data != null && data.getExtras() != null)
+        if (resultCode == RESULT_OK)
         {
-            Bundle bundle = data.getExtras();
-            ArrayList<PictureFromDeviceModel> selectPictures = bundle.getParcelableArrayList("pictures");
-            if (selectPictures != null && !selectPictures.isEmpty())
+            if (data != null && data.getExtras() != null)
             {
-                dataOnUI.addAll(selectPictures);
-                mAdapter.notifyDataSetChanged();
+                Bundle bundle = data.getExtras();
+                ArrayList<PictureFromDeviceModel> selectPictures = bundle.getParcelableArrayList("pictures");
+                if (selectPictures != null && !selectPictures.isEmpty())
+                {
+                    dataOnUI.addAll(selectPictures);
+                    mAdapter.notifyDataSetChanged();
+                }
             }
+            mBinding.btnShareFinish.setEnabled(!mBinding.etContent.getText().toString().isEmpty() && !dataOnUI.isEmpty());
         }
-        mBinding.btnShareFinish.setEnabled(!mBinding.etContent.getText().toString().isEmpty() && !dataOnUI.isEmpty());
     }
 
     @Override

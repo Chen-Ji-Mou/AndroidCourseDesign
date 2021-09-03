@@ -2,25 +2,25 @@ package com.chenjimou.androidcoursedesign.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.chenjimou.androidcoursedesign.base.BaseApplication;
+import com.chenjimou.androidcoursedesign.utils.DisplayUtils;
 import com.chenjimou.androidcoursedesign.utils.FlingUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
 
-@RequiresApi(api = Build.VERSION_CODES.M)
-public class MyNestedScrollView extends NestedScrollView {
+public class MyNestedScrollView extends NestedScrollView
+{
+    private ViewGroup mHeadView;
+    private ViewGroup mBottomView;
+    private onNestedScrollListener mListener;
 
-    private ViewGroup headView;
-    private ViewGroup contentView;
     // 工具类，用于转换速度和距离
     private FlingUtils mFlingUtils;
     // 标志 MyNestedScrollView 是否发生了惯性滑动
@@ -72,7 +72,7 @@ public class MyNestedScrollView extends NestedScrollView {
                     isFling = false;
                 }
                 // 当 MyNestedScrollView 已经滑到 headView 底部时，让 contentView 中的 RecyclerView 滑动
-                if (scrollY == headView.getMeasuredHeight())
+                if (scrollY == mHeadView.getMeasuredHeight())
                 {
                     dispatchRecyclerViewFling();
                 }
@@ -109,7 +109,7 @@ public class MyNestedScrollView extends NestedScrollView {
     private void recyclerViewFling(int velocityY)
     {
         // 寻找当前显示的 RecyclerView
-        RecyclerView childRecyclerView = findChildRecyclerView(contentView);
+        RecyclerView childRecyclerView = findChildRecyclerView(mBottomView);
         if (childRecyclerView != null)
         {
             childRecyclerView.fling(0, velocityY);
@@ -156,18 +156,18 @@ public class MyNestedScrollView extends NestedScrollView {
     protected void onFinishInflate()
     {
         super.onFinishInflate();
-        headView = (ViewGroup) ((ViewGroup) getChildAt(0)).getChildAt(0);
-        contentView = (ViewGroup) ((ViewGroup) getChildAt(0)).getChildAt(1);
+        mHeadView = (ViewGroup) ((ViewGroup) getChildAt(0)).getChildAt(0);
+        mBottomView = (ViewGroup) ((ViewGroup) getChildAt(0)).getChildAt(1);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
     {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        ViewGroup.LayoutParams layoutParams = contentView.getLayoutParams();
+        ViewGroup.LayoutParams layoutParams = mBottomView.getLayoutParams();
         // 修改contentView的高度为父容器的高度，实现吸顶效果
-        layoutParams.height = (int) (getMeasuredHeight() - actionBarSize);
-        contentView.setLayoutParams(layoutParams);
+        layoutParams.height = (int) (getMeasuredHeight() - actionBarSize - DisplayUtils.dip2px(BaseApplication.sApplication, 24));
+        mBottomView.setLayoutParams(layoutParams);
     }
 
     /**
@@ -182,11 +182,34 @@ public class MyNestedScrollView extends NestedScrollView {
         // 这里我们认为 MyNestedScrollView 就已经是最外层的 NestedScrollingParent，因此拦截嵌套滑动事件，不再传给外层 parent
         // getScrollY() 返回的是 MyNestedScrollView 滑动的总距离
         // 若当前 headView 仍可见，则需要先将 headView 滑动至不可见后才让 contentView 中的 RecyclerView 滑动
-        boolean hideTop = dy > 0 && getScrollY() < headView.getMeasuredHeight();
+        boolean hideTop = dy > 0 && getScrollY() < mHeadView.getMeasuredHeight();
+
         if (hideTop)
         {
             scrollBy(0, dy);
             consumed[1] = dy;
         }
+
+        if (getScrollY() > mHeadView.getMeasuredHeight())
+        {
+            if (mListener != null)
+                mListener.onBottomViewScroll();
+        }
+        else
+        {
+            if (mListener != null)
+                mListener.onHeadViewScroll();
+        }
+    }
+
+    public interface onNestedScrollListener
+    {
+        void onHeadViewScroll();
+        void onBottomViewScroll();
+    }
+
+    public void setOnNestedScrollListener(onNestedScrollListener listener)
+    {
+        mListener = listener;
     }
 }

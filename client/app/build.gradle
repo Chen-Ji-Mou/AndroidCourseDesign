@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.chenjimou.androidcoursedesign"
-        minSdkVersion 16
+        minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -59,7 +59,11 @@ dependencies {
 
     implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
 
-    /*============================ 系统栏设置向下兼容 ==================================*/
+    /*=========================== 系统栏设置向下兼容 ================================*/
 
     implementation 'com.readystatesoftware.systembartint:systembartint:1.0.3'
+
+    /*============================ 圆形头像的依赖 ==================================*/
+
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 }

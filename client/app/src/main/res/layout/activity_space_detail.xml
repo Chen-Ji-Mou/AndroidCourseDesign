@@ -4,28 +4,37 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:fitsSystemWindows="true">
+    android:orientation="vertical">
     
-    <androidx.appcompat.widget.Toolbar
+    <FrameLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
+        android:elevation="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
         
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
+            android:layout_height="?android:attr/actionBarSize">
+    
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="21dp"
+                android:src="@drawable/icon_back_arrow_white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
             
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.appcompat.widget.Toolbar>
+    </FrameLayout>
     
     <com.chenjimou.androidcoursedesign.widget.MyNestedScrollView
+        android:id="@+id/myNestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -41,7 +50,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-    
+        
                 <com.chenjimou.androidcoursedesign.widget.Banner
                     android:id="@+id/banner"
                     android:layout_width="match_parent"
@@ -49,7 +58,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
-    
+        
                 <ImageView
                     android:id="@+id/iv_favorite"
                     android:layout_width="wrap_content"
@@ -60,7 +69,7 @@
                     android:background="@drawable/icon_unfavorite"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/banner" />
-    
+        
                 <TextView
                     android:id="@+id/tv_favorite_count"
                     android:layout_width="wrap_content"
@@ -71,7 +80,7 @@
                     android:text="@string/tv_favorite_count"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/iv_favorite" />
-    
+        
                 <TextView
                     android:id="@+id/tv_content"
                     android:layout_width="wrap_content"
@@ -82,7 +91,7 @@
                     android:text="@string/tv_content"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tv_favorite_count" />
-    
+        
                 <TextView
                     android:id="@+id/tv_comment_count"
                     android:layout_width="wrap_content"
@@ -93,30 +102,38 @@
                     android:text="@string/tv_comment_count"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tv_content" />
-
+    
             </androidx.constraintlayout.widget.ConstraintLayout>
             
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                
+                android:layout_weight="1">
+    
                 <TextView
                     android:id="@+id/tv_comment_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:text="@string/tv_comment_title"
-                    android:gravity="center" />
-                
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+    
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_comment"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-                
-            </LinearLayout>
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_comment_title" />
+    
+                <include layout="@layout/layout_no_data" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
 

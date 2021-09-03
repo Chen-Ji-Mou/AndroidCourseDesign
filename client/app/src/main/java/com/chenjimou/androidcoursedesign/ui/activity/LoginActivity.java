@@ -26,6 +26,7 @@ import com.chenjimou.androidcoursedesign.databinding.ActivityLoginBinding;
 import com.chenjimou.androidcoursedesign.inter.RetrofitRequest;
 import com.chenjimou.androidcoursedesign.model.LoginModel;
 import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
+import com.chenjimou.androidcoursedesign.widget.LoadAnimationDialog;
 import com.google.gson.Gson;
 
 import java.util.concurrent.TimeUnit;
@@ -35,8 +36,10 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
     ActivityLoginBinding mBinding;
     Disposable mDisposable;
     Retrofit mRetrofit;
+    LoadAnimationDialog mDialog;
 
     boolean isError = false;
+    boolean isLogin = false;
 
     static final int ACTION_REGISTER = 0;
 
@@ -54,6 +57,8 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
 
     void init()
     {
+        mDialog = LoadAnimationDialog.init(this, "验证中，请稍后...");
+
         String usernameFromCache = SharedPreferencesUtils.getInstance().getUsername();
         String passwordFromCache = SharedPreferencesUtils.getInstance().getPassword();
 
@@ -91,6 +96,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
                 dispatchLogin();
                 break;
             case R.id.btn_register:
+                isLogin = false;
                 startActivityForResult(new Intent(LoginActivity.this, RegisterActivity.class), ACTION_REGISTER);
                 break;
         }
@@ -121,6 +127,10 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
     public void onStop()
     {
         super.onStop();
+
+        if (isLogin)
+            finish();
+
         if (mDisposable != null && !mDisposable.isDisposed())
             mDisposable.dispose();
     }
@@ -131,8 +141,11 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
                     Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        mBinding.etUsername.setText(data.getStringExtra("username"));
-        mBinding.etPassword.setText(data.getStringExtra("password"));
+        if (resultCode == RESULT_OK)
+        {
+            mBinding.etUsername.setText(data.getStringExtra("username"));
+            mBinding.etPassword.setText(data.getStringExtra("password"));
+        }
     }
 
     void dispatchLogin()
@@ -149,6 +162,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
                                     Disposable d)
                     {
                         mDisposable = d;
+                        mDialog.show();
                     }
 
                     @Override
@@ -170,7 +184,6 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
                     {
                         isError = true;
                         e.printStackTrace();
-                        Toast.makeText(LoginActivity.this, "登陆失败，请重试", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -178,9 +191,14 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
                     {
                         if (!isError)
                         {
+                            isLogin = true;
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
                         }
+                        else
+                        {
+                            Toast.makeText(LoginActivity.this, "登陆失败，请重试", Toast.LENGTH_SHORT).show();
+                        }
+                        mDialog.dismiss();
                     }
                 });
     }

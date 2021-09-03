@@ -23,4 +23,16 @@ public class DisplayUtils
         WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         return wm.getDefaultDisplay().getHeight();
     }
+
+    public static int getStatusBarSize(Context context)
+    {
+        int statusBarSize = -1;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0)
+        {
+            //根据资源ID获取响应的尺寸值
+            statusBarSize = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return statusBarSize;
+    }
 }

@@ -23,4 +23,5 @@
     <string name="tv_content">abcdefghijklmnopqrstuvwxyz</string>
     <string name="tv_comment_count">共30条评论</string>
     <string name="tv_comment_title">评论区</string>
+    <string name="tv_comment_content">abcdefghijklmnopqrstuvwxyz</string>
 </resources>

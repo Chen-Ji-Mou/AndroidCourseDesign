@@ -1,6 +1,7 @@
 package com.chenjimou.androidcoursedesign.ui.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -29,12 +30,11 @@ public class MainActivity extends AppCompatActivity implements
         BottomNavigationView.OnNavigationItemSelectedListener, View.OnClickListener
 {
     ActivityMainBinding mBinding;
+    HomeFragment mHomeFragment;
 
     List<Fragment> fragments = new ArrayList<>();
 
     static final int ACTION_SHARE = 0;
-
-    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -50,7 +50,9 @@ public class MainActivity extends AppCompatActivity implements
         SystemBarUtil.setStatusBarColor(this, R.color.colorPrimary);
         SystemBarUtil.setAndroidNativeLightStatusBar(this, false);
 
-        fragments.add(new HomeFragment());
+        mHomeFragment = new HomeFragment();
+
+        fragments.add(mHomeFragment);
         fragments.add(new PersonalFragment());
 
         mBinding.viewpager.setUserInputEnabled(false);
@@ -92,6 +94,18 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.btn_share:
                 startActivityForResult(new Intent(MainActivity.this, ShareEditActivity.class), ACTION_SHARE);
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+            @Nullable
+                    Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK)
+        {
+            mHomeFragment.onLoadLatest();
         }
     }
 

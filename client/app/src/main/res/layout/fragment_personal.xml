@@ -11,12 +11,12 @@
         android:layout_height="200dp"
         android:background="@color/colorPrimary">
     
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageView"
             android:layout_width="72dp"
             android:layout_height="72dp"
-            android:background="@drawable/bg_head_portrait_background"
-            android:src="@drawable/ic_launcher_foreground"
+            android:src="@drawable/icon_head_portrait_1"
+            app:civ_border_width="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -26,11 +26,11 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-public class Banner<T> extends FrameLayout implements ViewPager.OnPageChangeListener
+public class Banner extends FrameLayout implements ViewPager.OnPageChangeListener
 {
     private final Context mContext;
     // banner轮播的数据集合
-    private List<T> bannerDataList;
+    private List<String> bannerDataList;
     // 记录所有指示器中的"点"
     private List<View> indicators;
     // 记录指示器当前"点"的位置
@@ -71,9 +71,9 @@ public class Banner<T> extends FrameLayout implements ViewPager.OnPageChangeList
         viewPager = findViewById(R.id.banner_viewpager);
         indicator = findViewById(R.id.banner_indicator);
 
-        // 定死ViewPager的高度是屏幕的1/4
+        // 定死ViewPager的高度是屏幕的4/5
         ViewGroup.LayoutParams layoutParams = viewPager.getLayoutParams();
-        layoutParams.height = (int) (DisplayUtils.getScreenHeight((Activity) mContext) * 0.5);
+        layoutParams.height = (int) (DisplayUtils.getScreenHeight((Activity) mContext) * 0.8);
         viewPager.setLayoutParams(layoutParams);
 
         // 初始化数据
@@ -95,7 +95,7 @@ public class Banner<T> extends FrameLayout implements ViewPager.OnPageChangeList
      *
      * @param data banner数据
      */
-    public void notifyDataSetChanged(List<T> data)
+    public void notifyDataSetChanged(List<String> data)
     {
         if (null != data && !data.isEmpty())
         {
@@ -123,7 +123,7 @@ public class Banner<T> extends FrameLayout implements ViewPager.OnPageChangeList
                 {
                     imageView.setBackgroundResource(R.drawable.icon_banner_selected);
                 }
-                params.setMargins(0, 0, DisplayUtils.dip2px(mContext, 3), 0);
+                params.setMargins(0, 0, DisplayUtils.dip2px(mContext, 8), 0);
                 imageView.setLayoutParams(params);
                 // 添加"点"到指示器中
                 indicator.addView(imageView);
@@ -272,12 +272,12 @@ public class Banner<T> extends FrameLayout implements ViewPager.OnPageChangeList
                     switch (event.getAction())
                     {
                         case MotionEvent.ACTION_DOWN:
-                            mAutoRollTimer.stop();
+//                            mAutoRollTimer.stop();
                             downX = (int)v.getX();
                             downTime = System.currentTimeMillis();
                             break;
                         case MotionEvent.ACTION_UP:
-                            mAutoRollTimer.start(mAutoRollTimer.interval);
+//                            mAutoRollTimer.start(mAutoRollTimer.interval);
                             int moveX = (int)v.getX();
                             long moveTime = System.currentTimeMillis();
                             //判断为点击的条件
@@ -291,26 +291,22 @@ public class Banner<T> extends FrameLayout implements ViewPager.OnPageChangeList
                             }
                             break;
                         case MotionEvent.ACTION_CANCEL:
-                            mAutoRollTimer.start(mAutoRollTimer.interval);
+//                            mAutoRollTimer.start(mAutoRollTimer.interval);
                             break;
                     }
                     return true;
                 }
             });
 
-            T data = bannerDataList.get(position % bannerDataList.size());
-            if (data instanceof String)
-            {
-                String pictureId = (String) data;
+            String pictureId = bannerDataList.get(position % bannerDataList.size());
 
-                GlideUrl url = new GlideUrl(
-                        mContext.getString(R.string.request_picture_url) + pictureId,
-                        new LazyHeaders.Builder()
-                                .addHeader("Authorization", SharedPreferencesUtils.getInstance().getToken())
-                                .build());
+            GlideUrl url = new GlideUrl(
+                    mContext.getString(R.string.request_picture_url) + pictureId,
+                    new LazyHeaders.Builder()
+                            .addHeader("Authorization", SharedPreferencesUtils.getInstance().getToken())
+                            .build());
 
-                Glide.with(mContext).load(url).into(imageView);
-            }
+            Glide.with(mContext).load(url).into(imageView);
 
             // 添加imageView到布局中
             container.addView(imageView);
