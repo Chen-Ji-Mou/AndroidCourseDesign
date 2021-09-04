@@ -32,7 +32,6 @@ public class MyViewPager extends ViewPager
         {
             return super.onTouchEvent(arg0);
         }
-
         return false;
     }
 

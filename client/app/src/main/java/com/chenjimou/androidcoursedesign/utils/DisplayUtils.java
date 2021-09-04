@@ -12,15 +12,15 @@ public class DisplayUtils
         return (int)(dipValue * scale + 0.5f);
     }
 
-    public static int getScreenWidth(Activity activity)
+    public static int getScreenWidth(Context context)
     {
-        WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         return wm.getDefaultDisplay().getWidth();
     }
 
-    public static int getScreenHeight(Activity activity)
+    public static int getScreenHeight(Context context)
     {
-        WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         return wm.getDefaultDisplay().getHeight();
     }
 

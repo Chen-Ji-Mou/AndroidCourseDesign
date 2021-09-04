@@ -72,7 +72,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     final List<Integer> collectionCounts = new ArrayList<>();
 
     boolean isError = false;
-    int lastLoadPosition = 0;
+    int lastLoadPosition = -1;
 
     @Override
     protected ViewBinding createViewBinding(LayoutInflater inflater, ViewGroup container)
@@ -389,8 +389,10 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
             layoutParams.height = imageHeight;
             holder.iv_picture.setLayoutParams(layoutParams);
 
+            GetAllSpacesModel.DataDTO dto = dataOnUI.get(position);
+
             GlideUrl url = new GlideUrl(
-                    getString(R.string.request_picture_url) + dataOnUI.get(position).getPictures().get(0),
+                    getString(R.string.request_picture_url) + dto.getPictures().get(0),
                     new LazyHeaders.Builder()
                             .addHeader("Authorization", SharedPreferencesUtils.getInstance().getToken())
                             .build());
@@ -401,12 +403,14 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                     .override(imageWidth, imageHeight)
                     .into(holder.iv_picture);
 
-            holder.tv_content.setText(dataOnUI.get(position).getContent());
+            holder.tv_content.setText(dto.getContent());
 
-            String date = DateUtils.formatDate(dataOnUI.get(position).getDate());
+            String date = DateUtils.formatDate(dto.getDate());
             holder.tv_date.setText(date);
 
-            holder.tv_collection_count.setText(Integer.toString(collectionCounts.get(position)));
+            dto.setCollectionCount(collectionCounts.get(position));
+
+            holder.tv_collection_count.setText(String.format(getString(R.string.tv_collection_count), collectionCounts.get(position)));
         }
 
         @Override
@@ -442,9 +446,11 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                         int position = getLayoutPosition();
                         Intent intent = new Intent(getContext(), SpaceDetailActivity.class);
                         Bundle bundle = new Bundle();
+                        bundle.putString("spaceId", dataOnUI.get(position).getId());
                         bundle.putStringArrayList("pictures", (ArrayList<String>) dataOnUI.get(position).getPictures());
                         bundle.putString("content", dataOnUI.get(position).getContent());
-                        bundle.putLong("date", dataOnUI.get(position).getDate());
+                        bundle.putString("userId", dataOnUI.get(position).getUserId());
+                        bundle.putInt("collectionCount", dataOnUI.get(position).getCollectionCount());
                         intent.putExtras(bundle);
                         startActivity(intent);
                     }
@@ -496,10 +502,12 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                             {
                                 if (!isError)
                                 {
-                                    dataOnUI.get(position).setCollection(true);
+                                    GetAllSpacesModel.DataDTO dto = dataOnUI.get(position);
+                                    dto.setCollection(true);
                                     iv_collection.setBackgroundResource(R.drawable.icon_favorite);
                                     int count = collectionCounts.get(position);
-                                    tv_collection_count.setText(Integer.toString(++count));
+                                    dto.setCollectionCount(++count);
+                                    tv_collection_count.setText(String.format(getString(R.string.tv_collection_count), ++count));
                                 }
                                 else
                                 {

@@ -71,9 +71,8 @@ public class Banner extends FrameLayout implements ViewPager.OnPageChangeListene
         viewPager = findViewById(R.id.banner_viewpager);
         indicator = findViewById(R.id.banner_indicator);
 
-        // 定死ViewPager的高度是屏幕的4/5
         ViewGroup.LayoutParams layoutParams = viewPager.getLayoutParams();
-        layoutParams.height = (int) (DisplayUtils.getScreenHeight((Activity) mContext) * 0.8);
+        layoutParams.height = (int) (DisplayUtils.getScreenHeight((Activity) mContext) * 0.81);
         viewPager.setLayoutParams(layoutParams);
 
         // 初始化数据
@@ -209,8 +208,7 @@ public class Banner extends FrameLayout implements ViewPager.OnPageChangeListene
         @Override
         public int getCount()
         {
-            // 无限滑动
-            return null != bannerDataList && !bannerDataList.isEmpty() ? Integer.MAX_VALUE : 0;
+            return null != bannerDataList && !bannerDataList.isEmpty() ? bannerDataList.size() : 0;
         }
 
         @Override
