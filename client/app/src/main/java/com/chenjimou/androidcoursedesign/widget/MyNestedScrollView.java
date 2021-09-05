@@ -29,8 +29,10 @@ public class MyNestedScrollView extends NestedScrollView
     private int flingY = 0;
     // 当前惯性滑动的Y轴速度
     private int velocityY = 0;
-    // actionBar的高度
+    // 标题栏的高度
     private float actionBarSize;
+    // 状态栏的高度
+    private int statusBarSize;
 
     private static final int[] attrs = new int[] {
             android.R.attr.actionBarSize
@@ -54,6 +56,8 @@ public class MyNestedScrollView extends NestedScrollView
         TypedArray typedArray = context.obtainStyledAttributes(attrs);
         actionBarSize = typedArray.getDimension(0, 0);
         typedArray.recycle();
+
+        statusBarSize = DisplayUtils.getStatusBarSize(context);
 
         setOnScrollChangeListener(new View.OnScrollChangeListener()
         {
@@ -166,7 +170,7 @@ public class MyNestedScrollView extends NestedScrollView
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         ViewGroup.LayoutParams layoutParams = mBottomView.getLayoutParams();
         // 修改contentView的高度为父容器的高度，实现吸顶效果
-        layoutParams.height = (int) (getMeasuredHeight() - actionBarSize - DisplayUtils.dip2px(BaseApplication.sApplication, 24));
+        layoutParams.height = (int) (getMeasuredHeight() - actionBarSize - mHeadView.getMeasuredHeight());
         mBottomView.setLayoutParams(layoutParams);
     }
 
@@ -182,9 +186,9 @@ public class MyNestedScrollView extends NestedScrollView
         // 这里我们认为 MyNestedScrollView 就已经是最外层的 NestedScrollingParent，因此拦截嵌套滑动事件，不再传给外层 parent
         // getScrollY() 返回的是 MyNestedScrollView 滑动的总距离
         // 若当前 headView 仍可见，则需要先将 headView 滑动至不可见后才让 contentView 中的 RecyclerView 滑动
-        boolean hideTop = dy > 0 && getScrollY() < mHeadView.getMeasuredHeight();
+        boolean isHeadShow = dy > 0 && getScrollY() < mHeadView.getMeasuredHeight();
 
-        if (hideTop)
+        if (isHeadShow)
         {
             scrollBy(0, dy);
             consumed[1] = dy;

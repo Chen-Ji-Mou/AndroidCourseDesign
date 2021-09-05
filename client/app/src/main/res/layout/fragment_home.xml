@@ -72,7 +72,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
     
-        <include layout="@layout/layout_no_data" />
+        <include
+            android:id="@+id/layout_no_data"
+            layout="@layout/layout_no_data" />
         
     </androidx.constraintlayout.widget.ConstraintLayout>
     

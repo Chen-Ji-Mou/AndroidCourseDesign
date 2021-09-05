@@ -208,12 +208,12 @@ public class SharingImageSelectActivity extends AppCompatActivity implements Vie
                     if(!dataOnUI.isEmpty())
                     {
                         mBinding.recyclerview.setVisibility(View.VISIBLE);
-                        mBinding.getRoot().findViewById(R.id.layout_no_data).setVisibility(View.GONE);
+                        mBinding.layoutNoData.getRoot().setVisibility(View.GONE);
                     }
                     else
                     {
                         mBinding.recyclerview.setVisibility(View.GONE);
-                        mBinding.getRoot().findViewById(R.id.layout_no_data).setVisibility(View.VISIBLE);
+                        mBinding.layoutNoData.getRoot().setVisibility(View.VISIBLE);
                     }
                     mAdapter.notifyDataSetChanged();
                 }

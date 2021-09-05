@@ -14,7 +14,9 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -25,16 +27,22 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chenjimou.androidcoursedesign.R;
 import com.chenjimou.androidcoursedesign.databinding.ActivitySpaceDetailBinding;
+import com.chenjimou.androidcoursedesign.databinding.LayoutNoDataBinding;
+import com.chenjimou.androidcoursedesign.databinding.LayoutSpaceDetailBottomItemBinding;
 import com.chenjimou.androidcoursedesign.databinding.LayoutSpaceDetailItemBinding;
 import com.chenjimou.androidcoursedesign.inter.RetrofitRequest;
+import com.chenjimou.androidcoursedesign.model.AddNewCommentModel;
 import com.chenjimou.androidcoursedesign.model.GetCommentsModel;
+import com.chenjimou.androidcoursedesign.ui.SpaceDetailItemDecoration;
 import com.chenjimou.androidcoursedesign.utils.DisplayUtils;
 import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
+import com.chenjimou.androidcoursedesign.widget.LoadAnimationDialog;
 import com.chenjimou.androidcoursedesign.widget.MyCoordinatorLayout;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.gson.Gson;
@@ -52,18 +60,28 @@ public class SpaceDetailActivity extends AppCompatActivity
     Retrofit mRetrofit;
     Disposable mDisposable;
     InputMethodManager mManager;
+    LoadAnimationDialog mDialog;
 
     String spaceId;
     List<String> pictures;
     String content;
     String userId;
     int collectionCount = -1;
+
     int screenHeight = -1;
+    float actionBarSize = -1;
+    boolean isFirstLoad = true;
 
     List<GetCommentsModel.DataDTO> comments = new ArrayList<>();
     boolean isError = false;
     boolean isInputOpen = false;
     int lastLoadPosition = -1;
+
+    static final int[] attrs = new int[] {
+            android.R.attr.actionBarSize
+    };
+
+    private static final String TAG = "SpaceDetailActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -86,11 +104,18 @@ public class SpaceDetailActivity extends AppCompatActivity
 
         screenHeight = DisplayUtils.getScreenHeight(this);
 
+        mDialog = LoadAnimationDialog.init(this, "加载中，请稍后...");
+
+        TypedArray typedArray = obtainStyledAttributes(attrs);
+        actionBarSize = typedArray.getDimension(0, 0);
+        typedArray.recycle();
+
         ViewGroup.LayoutParams layoutParams = mBinding.appBarLayout.getLayoutParams();
         layoutParams.height = (int)(screenHeight * 0.75);
         mBinding.appBarLayout.setLayoutParams(layoutParams);
 
         mBinding.rvComment.setLayoutManager(new LinearLayoutManager(this));
+        mBinding.rvComment.addItemDecoration(new SpaceDetailItemDecoration());
 
         mAdapter = new SpaceDetailAdapter();
         mBinding.rvComment.setAdapter(mAdapter);
@@ -159,6 +184,10 @@ public class SpaceDetailActivity extends AppCompatActivity
                             Disposable d)
             {
                 mDisposable = d;
+                if (isFirstLoad)
+                {
+                    mDialog.show();
+                }
             }
 
             @Override
@@ -182,38 +211,96 @@ public class SpaceDetailActivity extends AppCompatActivity
             @Override
             public void onComplete()
             {
+                if (isFirstLoad)
+                {
+                    mDialog.dismiss();
+                }
                 if (!isError)
                 {
-                    if (!comments.isEmpty())
-                    {
-                        mBinding.rvComment.setVisibility(View.VISIBLE);
-                        mBinding.getRoot().findViewById(R.id.layout_no_data).setVisibility(View.GONE);
-                    }
-                    else
-                    {
-                        mBinding.rvComment.setVisibility(View.GONE);
-                        mBinding.getRoot().findViewById(R.id.layout_no_data).setVisibility(View.VISIBLE);
-                    }
                     mAdapter.notifyDataSetChanged();
                     mBinding.tvCommentCount.setText(getString(R.string.tv_comment_count, comments.size()));
+                    if (!isFirstLoad)
+                    {
+                        mBinding.rvComment.smoothScrollToPosition(comments.size());
+                    }
                     lastLoadPosition = comments.size();
+                    isFirstLoad = false;
                 }
                 else
                 {
                     Toast.makeText(SpaceDetailActivity.this, "加载失败，请重试", Toast.LENGTH_SHORT).show();
-                    finish();
                 }
             }
         });
     }
 
+    void postNewComment(String content)
+    {
+        mRetrofit.create(RetrofitRequest.class)
+        .addNewComment(SharedPreferencesUtils.getInstance().getToken(), content, spaceId)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Observer<AddNewCommentModel>()
+        {
+            @Override
+            public void onSubscribe(
+                    @io.reactivex.annotations.NonNull
+                            Disposable d)
+            {
+                mDisposable = d;
+            }
+
+            @Override
+            public void onNext(
+                    @io.reactivex.annotations.NonNull
+                            AddNewCommentModel addNewCommentModel)
+            {
+                isError = false;
+
+                GetCommentsModel.DataDTO dto = new GetCommentsModel.DataDTO();
+                dto.setContent(addNewCommentModel.getData().getContent());
+                dto.setDate(addNewCommentModel.getData().getDate());
+                dto.setId(addNewCommentModel.getData().getId());
+                dto.setPostId(addNewCommentModel.getData().getPostId());
+                dto.setUserId(addNewCommentModel.getData().getUserId());
+                comments.add(dto);
+            }
+
+            @Override
+            public void onError(
+                    @io.reactivex.annotations.NonNull
+                            Throwable e)
+            {
+                isError = true;
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete()
+            {
+                if (!isError)
+                {
+                    reset();
+                    loadComments();
+                }
+                else
+                {
+                    Toast.makeText(SpaceDetailActivity.this, "发布评论失败，请重试", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    void showSoftKeyboard()
+    {
+        mBinding.etInputComment.requestFocus();
+        mManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
     void hideSoftKeyboard()
     {
         mBinding.etInputComment.clearFocus();
-        if (mManager.isActive() && getCurrentFocus() != null && getCurrentFocus().getWindowToken() != null)
-        {
-            mManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
+        mManager.hideSoftInputFromWindow(mBinding.etInputComment.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     void reset()
@@ -235,8 +322,7 @@ public class SpaceDetailActivity extends AppCompatActivity
             case R.id.btn_comment:
                 mBinding.etInputComment.setVisibility(View.VISIBLE);
                 isInputOpen = true;
-                mBinding.etInputComment.requestFocus();
-                mManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                showSoftKeyboard();
                 break;
         }
     }
@@ -278,13 +364,12 @@ public class SpaceDetailActivity extends AppCompatActivity
             }
 
             mBinding.etInputComment.setText(null);
-            hideSoftKeyboard();
             mBinding.etInputComment.setVisibility(View.GONE);
             isInputOpen = false;
+            hideSoftKeyboard();
 
-//            comments.add(inputContent);
-//            mAdapter.notifyItemInserted(comments.size());
-//            recyclerView.smoothScrollToPosition(comments.size() + 1);
+            postNewComment(inputContent);
+
             return true;
         }
         return false;
@@ -295,6 +380,7 @@ public class SpaceDetailActivity extends AppCompatActivity
     {
         if (isInputOpen && !isInput)
         {
+            mBinding.etInputComment.setText(null);
             mBinding.etInputComment.setVisibility(View.GONE);
             isInputOpen = false;
             hideSoftKeyboard();
@@ -309,34 +395,91 @@ public class SpaceDetailActivity extends AppCompatActivity
             mDisposable.dispose();
     }
 
-    class SpaceDetailAdapter extends RecyclerView.Adapter<SpaceDetailAdapter.AmongViewHolder>
+    class SpaceDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     {
+        LayoutNoDataBinding noDataItemBinding;
         LayoutSpaceDetailItemBinding amongItemBinding;
+
+        static final int TYPE_NO_DATA = 0;
+        static final int TYPE_AMONG = 1;
+
+        @Override
+        public int getItemViewType(int position)
+        {
+            if (comments.isEmpty())
+            {
+                return TYPE_NO_DATA;
+            }
+            else
+            {
+                return TYPE_AMONG;
+            }
+        }
 
         @NonNull
         @Override
-        public SpaceDetailAdapter.AmongViewHolder onCreateViewHolder(
+        public RecyclerView.ViewHolder onCreateViewHolder(
                 @NonNull
                         ViewGroup parent, int viewType)
         {
-            amongItemBinding = LayoutSpaceDetailItemBinding.inflate(getLayoutInflater());
-            return new AmongViewHolder(amongItemBinding.getRoot());
+            RecyclerView.ViewHolder holder;
+            if (viewType == TYPE_NO_DATA)
+            {
+                noDataItemBinding = LayoutNoDataBinding.inflate(getLayoutInflater(), parent, false);
+                holder = new NoDataViewHolder(noDataItemBinding.getRoot());
+            }
+            else
+            {
+                amongItemBinding = LayoutSpaceDetailItemBinding.inflate(getLayoutInflater(), parent, false);
+                holder = new AmongViewHolder(amongItemBinding.getRoot());
+            }
+            return holder;
         }
 
         @Override
         public void onBindViewHolder(
                 @NonNull
-                SpaceDetailAdapter.AmongViewHolder viewHolder, int position)
+                        RecyclerView.ViewHolder holder, int position)
         {
-            GetCommentsModel.DataDTO dto = comments.get(position);
-            viewHolder.tv_comment_content.setText(dto.getContent());
-            viewHolder.tv_user_name.setText(String.format(getString(R.string.tv_user_name), dto.getUserId()));
+            if (getItemViewType(position) == TYPE_AMONG)
+            {
+                AmongViewHolder viewHolder = (AmongViewHolder) holder;
+                GetCommentsModel.DataDTO dto = comments.get(position);
+                viewHolder.tv_comment_content.setText(dto.getContent());
+                viewHolder.tv_user_name.setText(String.format(getString(R.string.tv_user_name), dto.getUserId()));
+            }
+            else if (getItemViewType(position) == TYPE_NO_DATA)
+            {
+                int screenHeight = DisplayUtils.getScreenHeight(SpaceDetailActivity.this);
+                int itemHeight = (int)(screenHeight - actionBarSize
+                        - mBinding.layoutCommentHead.getHeight() - DisplayUtils.dip2px(SpaceDetailActivity.this, 50));
+                ViewGroup.LayoutParams layoutParams = holder.itemView.getLayoutParams();
+                layoutParams.height = itemHeight;
+                holder.itemView.setLayoutParams(layoutParams);
+            }
         }
 
         @Override
         public int getItemCount()
         {
-            return comments.size();
+            if (comments.isEmpty())
+            {
+                return 1;
+            }
+            else
+            {
+                return comments.size();
+            }
+        }
+
+        public class NoDataViewHolder extends RecyclerView.ViewHolder
+        {
+            public NoDataViewHolder(
+                    @NonNull
+                            View itemView)
+            {
+                super(itemView);
+            }
         }
 
         public class AmongViewHolder extends RecyclerView.ViewHolder

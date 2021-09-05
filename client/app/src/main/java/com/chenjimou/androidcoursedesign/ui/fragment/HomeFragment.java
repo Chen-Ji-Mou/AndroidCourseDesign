@@ -306,12 +306,12 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                     if (!dataOnUI.isEmpty())
                     {
                         mBinding.recyclerview.setVisibility(View.VISIBLE);
-                        mBinding.getRoot().findViewById(R.id.layout_no_data).setVisibility(View.GONE);
+                        mBinding.layoutNoData.getRoot().setVisibility(View.GONE);
                     }
                     else
                     {
                         mBinding.recyclerview.setVisibility(View.GONE);
-                        mBinding.getRoot().findViewById(R.id.layout_no_data).setVisibility(View.VISIBLE);
+                        mBinding.layoutNoData.getRoot().setVisibility(View.VISIBLE);
                     }
                     mAdapter.notifyDataSetChanged();
                     lastLoadPosition = dataOnUI.size();
@@ -380,7 +380,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                 @NonNull
                         HomeAdapter.ViewHolder holder, int position)
         {
-            int screenWidth = DisplayUtils.getScreenWidth((Activity)getContext());
+            int screenWidth = DisplayUtils.getScreenWidth(getContext());
             int imageWidth = screenWidth / 2;
             int imageHeight = (int) (imageWidth / (1.0f * sourceWidths.get(position) / sourceHeights.get(position)));
 
