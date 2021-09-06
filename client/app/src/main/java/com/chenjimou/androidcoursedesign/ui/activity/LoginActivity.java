@@ -2,10 +2,14 @@ package com.chenjimou.androidcoursedesign.ui.activity;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -16,6 +20,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -25,11 +30,19 @@ import com.chenjimou.androidcoursedesign.R;
 import com.chenjimou.androidcoursedesign.databinding.ActivityLoginBinding;
 import com.chenjimou.androidcoursedesign.inter.RetrofitRequest;
 import com.chenjimou.androidcoursedesign.model.LoginModel;
+import com.chenjimou.androidcoursedesign.utils.DecodeUtils;
 import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
 import com.chenjimou.androidcoursedesign.widget.LoadAnimationDialog;
 import com.google.gson.Gson;
 
+import org.json.JSONObject;
+
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
+
+import javax.crypto.Mac;
+import javax.crypto.MacSpi;
 
 public class LoginActivity extends AppCompatActivity implements TextWatcher, View.OnClickListener
 {
@@ -151,55 +164,73 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Vie
     void dispatchLogin()
     {
         mRetrofit.create(RetrofitRequest.class)
-                .login(mBinding.etUsername.getText().toString(), mBinding.etPassword.getText().toString())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<LoginModel>()
+        .login(mBinding.etUsername.getText().toString(), mBinding.etPassword.getText().toString())
+        .map(new Function<LoginModel, LoginModel>()
+        {
+            @Override
+            public LoginModel apply(
+                    @NonNull
+                            LoginModel loginModel) throws Exception
+            {
+                String token = loginModel.getData();
+                String[] split = token.split("\\.");
+                String payload = split[1];
+                byte[] decode = DecodeUtils.decodeByBase64(payload);
+                String json = new String(decode);
+                JSONObject jsonObject = new JSONObject(json);
+                String userId = jsonObject.getString("id");
+                SharedPreferencesUtils.getInstance().saveUserId(userId);
+                return loginModel;
+            }
+        })
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Observer<LoginModel>()
+        {
+            @Override
+            public void onSubscribe(
+                    @NonNull
+                            Disposable d)
+            {
+                mDisposable = d;
+                mDialog.show();
+            }
+
+            @Override
+            public void onNext(
+                    @NonNull
+                            LoginModel loginModel)
+            {
+                isError = false;
+                Log.d(TAG, "onNext: token "+loginModel.getData());
+                SharedPreferencesUtils.getInstance().saveToken("Bearer " + loginModel.getData());
+                SharedPreferencesUtils.getInstance().saveUsername(mBinding.etUsername.getText().toString());
+                SharedPreferencesUtils.getInstance().savePassword(mBinding.etPassword.getText().toString());
+            }
+
+            @Override
+            public void onError(
+                    @NonNull
+                            Throwable e)
+            {
+                isError = true;
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete()
+            {
+                if (!isError)
                 {
-                    @Override
-                    public void onSubscribe(
-                            @NonNull
-                                    Disposable d)
-                    {
-                        mDisposable = d;
-                        mDialog.show();
-                    }
-
-                    @Override
-                    public void onNext(
-                            @NonNull
-                                    LoginModel loginModel)
-                    {
-                        isError = false;
-                        Log.d(TAG, "onNext: token "+loginModel.getData());
-                        SharedPreferencesUtils.getInstance().saveToken("Bearer " + loginModel.getData());
-                        SharedPreferencesUtils.getInstance().saveUsername(mBinding.etUsername.getText().toString());
-                        SharedPreferencesUtils.getInstance().savePassword(mBinding.etPassword.getText().toString());
-                    }
-
-                    @Override
-                    public void onError(
-                            @NonNull
-                                    Throwable e)
-                    {
-                        isError = true;
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onComplete()
-                    {
-                        if (!isError)
-                        {
-                            isLogin = true;
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        }
-                        else
-                        {
-                            Toast.makeText(LoginActivity.this, "登陆失败，请重试", Toast.LENGTH_SHORT).show();
-                        }
-                        mDialog.dismiss();
-                    }
-                });
+                    isLogin = true;
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                }
+                else
+                {
+                    Toast.makeText(LoginActivity.this, "登陆失败，请重试", Toast.LENGTH_SHORT).show();
+                }
+                mDialog.dismiss();
+            }
+        });
     }
 }

@@ -59,6 +59,8 @@ public class GetSpaceDetailModel implements Serializable
         private String userId;
         @JsonProperty("pictures")
         private List<String> pictures;
+        @JsonProperty("isStar")
+        private int isStar;
 
         public String getId()
         {
@@ -108,6 +110,16 @@ public class GetSpaceDetailModel implements Serializable
         public void setPictures(List<String> pictures)
         {
             this.pictures = pictures;
+        }
+
+        public int getIsStar()
+        {
+            return isStar;
+        }
+
+        public void setIsStar(int isStar)
+        {
+            this.isStar = isStar;
         }
     }
 }

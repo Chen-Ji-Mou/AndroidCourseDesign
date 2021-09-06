@@ -3,6 +3,7 @@ package com.chenjimou.androidcoursedesign.ui.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +74,8 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
 
     boolean isError = false;
     int lastLoadPosition = -1;
+
+    public static final int ACTION_POST_STAR = 0;
 
     @Override
     protected ViewBinding createViewBinding(LayoutInflater inflater, ViewGroup container)
@@ -411,6 +414,15 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
             dto.setCollectionCount(collectionCounts.get(position));
 
             holder.tv_collection_count.setText(String.format(getString(R.string.tv_collection_count), collectionCounts.get(position)));
+
+            if (dto.getIsStar() == 1)
+            {
+                holder.iv_collection.setBackgroundResource(R.drawable.icon_favorite);
+            }
+            else
+            {
+                holder.iv_collection.setBackgroundResource(R.drawable.icon_unfavorite);
+            }
         }
 
         @Override
@@ -447,12 +459,9 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                         Intent intent = new Intent(getContext(), SpaceDetailActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putString("spaceId", dataOnUI.get(position).getId());
-                        bundle.putStringArrayList("pictures", (ArrayList<String>) dataOnUI.get(position).getPictures());
-                        bundle.putString("content", dataOnUI.get(position).getContent());
-                        bundle.putString("userId", dataOnUI.get(position).getUserId());
                         bundle.putInt("collectionCount", dataOnUI.get(position).getCollectionCount());
                         intent.putExtras(bundle);
-                        startActivity(intent);
+                        startActivityForResult(intent, ACTION_POST_STAR);
                     }
                 });
 
@@ -462,9 +471,6 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                     public void onClick(View v)
                     {
                         int position = getLayoutPosition();
-
-                        if (dataOnUI.get(position).isCollection())
-                            return;
 
                         mRetrofit.create(RetrofitRequest.class)
                         .postStar(SharedPreferencesUtils.getInstance().getToken(), dataOnUI.get(position).getId())
@@ -503,11 +509,22 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
                                 if (!isError)
                                 {
                                     GetAllSpacesModel.DataDTO dto = dataOnUI.get(position);
-                                    dto.setCollection(true);
-                                    iv_collection.setBackgroundResource(R.drawable.icon_favorite);
                                     int count = collectionCounts.get(position);
-                                    dto.setCollectionCount(++count);
-                                    tv_collection_count.setText(String.format(getString(R.string.tv_collection_count), ++count));
+                                    if (dto.getIsStar() == 1)
+                                    {
+                                        iv_collection.setBackgroundResource(R.drawable.icon_unfavorite);
+                                        dto.setIsStar(0);
+                                        count--;
+                                    }
+                                    else
+                                    {
+                                        iv_collection.setBackgroundResource(R.drawable.icon_favorite);
+                                        dto.setIsStar(1);
+                                        count++;
+                                    }
+                                    collectionCounts.set(position, count);
+                                    dto.setCollectionCount(count);
+                                    tv_collection_count.setText(String.format(getString(R.string.tv_collection_count), count));
                                 }
                                 else
                                 {

@@ -27,4 +27,6 @@
     <string name="tv_title">详情界面</string>
     <string name="btn_comment">评论</string>
     <string name="et_input_comment">请输入评论内容</string>
+    <string name="tv_my_space">我的动态</string>
+    <string name="tv_my_comment">我的评论</string>
 </resources>

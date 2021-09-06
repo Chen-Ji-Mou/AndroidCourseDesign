@@ -13,6 +13,7 @@ public class SharedPreferencesUtils
     static final String KEY_USERNAME = "username";
     static final String KEY_PASSWORD = "password";
     static final String KEY_TOKEN = "token";
+    static final String KEY_USER_ID = "userId";
 
     public static void init(Application applicationContext)
     {
@@ -66,6 +67,16 @@ public class SharedPreferencesUtils
     public String getToken()
     {
         return mPref.getString(KEY_TOKEN, null);
+    }
+
+    public void saveUserId(String userId)
+    {
+        mPref.edit().putString(KEY_USER_ID, userId).apply();
+    }
+
+    public String getUserId()
+    {
+        return mPref.getString(KEY_USER_ID, null);
     }
 
     public void reset()

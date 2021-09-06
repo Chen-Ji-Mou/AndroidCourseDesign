@@ -59,8 +59,8 @@ public class GetAllSpacesModel implements Serializable
         private String userId;
         @JsonProperty("pictures")
         private List<String> pictures;
-
-        private boolean isCollection;
+        @JsonProperty("isStar")
+        private int isStar;
 
         private int collectionCount;
 
@@ -114,14 +114,14 @@ public class GetAllSpacesModel implements Serializable
             this.pictures = pictures;
         }
 
-        public boolean isCollection()
+        public int getIsStar()
         {
-            return isCollection;
+            return isStar;
         }
 
-        public void setCollection(boolean collection)
+        public void setIsStar(int isStar)
         {
-            isCollection = collection;
+            this.isStar = isStar;
         }
 
         public int getCollectionCount()

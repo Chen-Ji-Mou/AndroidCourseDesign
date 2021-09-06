@@ -14,11 +14,13 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,18 +29,19 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chenjimou.androidcoursedesign.R;
 import com.chenjimou.androidcoursedesign.databinding.ActivitySpaceDetailBinding;
 import com.chenjimou.androidcoursedesign.databinding.LayoutNoDataBinding;
-import com.chenjimou.androidcoursedesign.databinding.LayoutSpaceDetailBottomItemBinding;
 import com.chenjimou.androidcoursedesign.databinding.LayoutSpaceDetailItemBinding;
 import com.chenjimou.androidcoursedesign.inter.RetrofitRequest;
 import com.chenjimou.androidcoursedesign.model.AddNewCommentModel;
+import com.chenjimou.androidcoursedesign.model.GetAllSpacesModel;
 import com.chenjimou.androidcoursedesign.model.GetCommentsModel;
+import com.chenjimou.androidcoursedesign.model.GetSpaceDetailModel;
+import com.chenjimou.androidcoursedesign.model.PostStarModel;
 import com.chenjimou.androidcoursedesign.ui.SpaceDetailItemDecoration;
 import com.chenjimou.androidcoursedesign.utils.DisplayUtils;
 import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
@@ -63,14 +66,13 @@ public class SpaceDetailActivity extends AppCompatActivity
     LoadAnimationDialog mDialog;
 
     String spaceId;
-    List<String> pictures;
-    String content;
-    String userId;
     int collectionCount = -1;
 
     int screenHeight = -1;
     float actionBarSize = -1;
     boolean isFirstLoad = true;
+    int isStar = -1;
+    boolean isRefresh = false;
 
     List<GetCommentsModel.DataDTO> comments = new ArrayList<>();
     boolean isError = false;
@@ -139,9 +141,6 @@ public class SpaceDetailActivity extends AppCompatActivity
         if (getIntent() != null && getIntent().getExtras() != null)
         {
             spaceId = getIntent().getExtras().getString("spaceId");
-            pictures = getIntent().getExtras().getStringArrayList("pictures");
-            content = getIntent().getExtras().getString("content");
-            userId = getIntent().getExtras().getString("userId");
             collectionCount = getIntent().getExtras().getInt("collectionCount");
         }
     }
@@ -151,23 +150,75 @@ public class SpaceDetailActivity extends AppCompatActivity
     {
         super.onResume();
 
-        if (pictures != null)
-        {
-            mBinding.banner.notifyDataSetChanged(pictures);
-        }
-
         if (collectionCount != -1)
         {
             mBinding.tvFavoriteCount.setText(String.format(getString(R.string.tv_favorite_count), collectionCount));
         }
 
-        if (content != null)
-        {
-            mBinding.tvContent.setText(content);
-        }
-
         reset();
-        loadComments();
+        loadDetail();
+    }
+
+    void loadDetail()
+    {
+        mRetrofit.create(RetrofitRequest.class)
+        .getSpaceDetail(SharedPreferencesUtils.getInstance().getToken(), spaceId)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Observer<GetSpaceDetailModel>()
+        {
+            @Override
+            public void onSubscribe(
+                    @io.reactivex.annotations.NonNull
+                            Disposable d)
+            {
+                mDisposable = d;
+                mDialog.show();
+            }
+
+            @Override
+            public void onNext(
+                    @io.reactivex.annotations.NonNull
+                            GetSpaceDetailModel getSpaceDetailModel)
+            {
+                isError = false;
+                mBinding.banner.notifyDataSetChanged(getSpaceDetailModel.getData().getPictures());
+                mBinding.tvContent.setText(getSpaceDetailModel.getData().getContent());
+                isStar = getSpaceDetailModel.getData().getIsStar();
+                if (isStar == 1)
+                {
+                    mBinding.fab.setImageResource(R.drawable.icon_favorite);
+                    mBinding.fab.setSupportImageTintList(ColorStateList.valueOf(Color.parseColor("#E51C23")));
+                }
+                else
+                {
+                    mBinding.fab.setImageResource(R.drawable.icon_unfavorite);
+                    mBinding.fab.setSupportImageTintList(ColorStateList.valueOf(Color.parseColor("#BDBDBD")));
+                }
+            }
+
+            @Override
+            public void onError(
+                    @io.reactivex.annotations.NonNull
+                            Throwable e)
+            {
+                isError = true;
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete()
+            {
+                if (!isError)
+                {
+                    loadComments();
+                }
+                else
+                {
+                    Toast.makeText(SpaceDetailActivity.this, "加载失败，请重试", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     void loadComments()
@@ -184,10 +235,6 @@ public class SpaceDetailActivity extends AppCompatActivity
                             Disposable d)
             {
                 mDisposable = d;
-                if (isFirstLoad)
-                {
-                    mDialog.show();
-                }
             }
 
             @Override
@@ -317,7 +364,7 @@ public class SpaceDetailActivity extends AppCompatActivity
         switch (v.getId())
         {
             case R.id.fab:
-                Toast.makeText(this, "点赞", Toast.LENGTH_SHORT).show();
+                postStar();
                 break;
             case R.id.btn_comment:
                 mBinding.etInputComment.setVisibility(View.VISIBLE);
@@ -325,6 +372,73 @@ public class SpaceDetailActivity extends AppCompatActivity
                 showSoftKeyboard();
                 break;
         }
+    }
+
+    void postStar()
+    {
+        mRetrofit.create(RetrofitRequest.class)
+        .postStar(SharedPreferencesUtils.getInstance().getToken(), spaceId)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Observer<PostStarModel>()
+        {
+            @Override
+            public void onSubscribe(
+                    @io.reactivex.annotations.NonNull
+                            Disposable d)
+            {
+                mDisposable = d;
+            }
+
+            @Override
+            public void onNext(
+                    @io.reactivex.annotations.NonNull
+                            PostStarModel postStarModel)
+            {
+                isError = false;
+            }
+
+            @Override
+            public void onError(
+                    @io.reactivex.annotations.NonNull
+                            Throwable e)
+            {
+                isError = true;
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete()
+            {
+                if (!isError)
+                {
+                    if (isStar == 1)
+                    {
+                        mBinding.fab.setImageResource(R.drawable.icon_unfavorite);
+                        mBinding.fab.setSupportImageTintList(ColorStateList.valueOf(Color.parseColor("#BDBDBD")));
+                        isStar = 0;
+                        collectionCount--;
+                    }
+                    else
+                    {
+                        mBinding.fab.setImageResource(R.drawable.icon_favorite);
+                        mBinding.fab.setSupportImageTintList(ColorStateList.valueOf(Color.parseColor("#E51C23")));
+                        isStar = 1;
+                        collectionCount++;
+                    }
+                    mBinding.tvFavoriteCount.setText(String.format(getString(R.string.tv_favorite_count), collectionCount));
+
+                    if (!isRefresh)
+                    {
+                        setResult(RESULT_OK);
+                    }
+                }
+                else
+                {
+                    Toast.makeText(SpaceDetailActivity.this, "点赞失败，请重试", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
@@ -484,7 +598,7 @@ public class SpaceDetailActivity extends AppCompatActivity
 
         public class AmongViewHolder extends RecyclerView.ViewHolder
         {
-            ImageView iv_user_icon;
+            ImageView iv_head_portrait;
             TextView tv_user_name;
             TextView tv_comment_content;
 
@@ -493,7 +607,7 @@ public class SpaceDetailActivity extends AppCompatActivity
                             View itemView)
             {
                 super(itemView);
-                iv_user_icon = amongItemBinding.ivUserIcon;
+                iv_head_portrait = amongItemBinding.ivHeadPortrait;
                 tv_user_name = amongItemBinding.tvUserName;
                 tv_comment_content = amongItemBinding.tvCommentContent;
             }

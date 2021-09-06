@@ -1,6 +1,7 @@
 package com.chenjimou.androidcoursedesign.ui.fragment;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.chenjimou.androidcoursedesign.ui.LazyLoadFragment;
@@ -9,7 +10,7 @@ import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
 
 import androidx.viewbinding.ViewBinding;
 
-public class PersonalFragment extends LazyLoadFragment
+public class PersonalFragment extends LazyLoadFragment implements View.OnClickListener
 {
     FragmentPersonalBinding mBinding;
 
@@ -31,5 +32,11 @@ public class PersonalFragment extends LazyLoadFragment
     protected void initDataFirst()
     {
         mBinding.tvUserName.setText(SharedPreferencesUtils.getInstance().getUsername());
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        
     }
 }
