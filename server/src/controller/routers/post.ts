@@ -18,8 +18,8 @@ export default function addPostRouter(router: Router<any, {}>, database: MySQL) 
                 const token = ctx.header.authorization;
                 const tokenData = verifyToken(token);
 
-                const [searchPostList] = await database.execute(
-                    `SELECT * FROM post ORDER BY date;`
+                let [searchPostList] = await database.execute(
+                    `SELECT post.id, post.content, post.user_id, post.pictures, post.date, IF(star.user_id, TRUE, FALSE) as is_star FROM post LEFT JOIN star ON post.id=star.post_id ORDER BY date;`
                 ) as [Array<any>, any];
                 const postList: Array<Post> = searchPostList.map(x => {
                     return {
@@ -121,7 +121,7 @@ export default function addPostRouter(router: Router<any, {}>, database: MySQL) 
                 if (!requestData.id) throw new ApiError("目标id不能为空");
 
                 const [searchPost] = await database.execute(
-                    `SELECT * FROM post WHERE id='${requestData.id}'`
+                    `SELECT post.id, post.content, post.user_id, post.pictures, post.date, IF(star.user_id, TRUE, FALSE) as is_star FROM post LEFT JOIN star ON post.id=star.post_id AND star.user_id='${tokenData.id}' WHERE post.id='${requestData.id}' ORDER BY date;`
                 ) as [Array<any>, any];
                 if (searchPost.length === 0) throw new ApiError("目标动态不存在");
                 

@@ -94,7 +94,8 @@ GET: /api/post/hello（带token）
                 "/api/picture/<pictureId3>",
                 "/api/picture/<pictureId4>"
             ],
-            "date":"<number>"
+            "date":"<number>",
+            "isStar":"<0 or 1>"
         },
         {
             "id":"<string>",
@@ -104,7 +105,8 @@ GET: /api/post/hello（带token）
                 "/api/picture/<pictureId1>",
                 "/api/picture/<pictureId2>"
             ],
-            "date":"<number>"
+            "date":"<number>",
+            "isStar":"<0 or 1>"
         },
         ...... // 略
     ],
@@ -177,7 +179,8 @@ GET: /api/post/:id （带token，注意这里的参数id）
             "/api/picture/<pictureId1>",
             "/api/picture/<pictureId2>"
         ],
-        "date":"<number>"
+        "date":"<number>",
+        "isStar":"<0 or 1>"
     },
     "code":0,
     "msg":"success"
