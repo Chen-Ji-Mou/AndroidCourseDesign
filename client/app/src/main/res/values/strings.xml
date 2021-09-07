@@ -29,4 +29,6 @@
     <string name="et_input_comment">请输入评论内容</string>
     <string name="tv_my_space">我的动态</string>
     <string name="tv_my_comment">我的评论</string>
+    <string name="tv_space_content">动态内容</string>
+    <string name="tv_space_date">2021-09-07</string>
 </resources>

@@ -90,7 +90,6 @@ public class ShareEditActivity extends AppCompatActivity implements View.OnClick
 
         mBinding.toolbar.setTitle("");
         setSupportActionBar(mBinding.toolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mBinding.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(3,

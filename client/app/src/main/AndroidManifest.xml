@@ -15,7 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/MaterialAppTheme"
         tools:targetApi="n">
-        <activity android:name=".ui.activity.MySpaceActivity"></activity>
+        <activity
+            android:name=".ui.activity.MySpaceActivity"
+            android:theme="@style/ToolBarAppTheme" />
         <activity
             android:name=".ui.activity.SpaceDetailActivity"
             android:theme="@style/ImmersiveTheme"

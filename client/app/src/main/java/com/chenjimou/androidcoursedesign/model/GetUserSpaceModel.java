@@ -60,6 +60,8 @@ public class GetUserSpaceModel implements Serializable
         @JsonProperty("pictures")
         private List<String> pictures;
 
+        private int collectionCount;
+
         public String getId()
         {
             return id;
@@ -108,6 +110,16 @@ public class GetUserSpaceModel implements Serializable
         public void setPictures(List<String> pictures)
         {
             this.pictures = pictures;
+        }
+
+        public int getCollectionCount()
+        {
+            return collectionCount;
+        }
+
+        public void setCollectionCount(int collectionCount)
+        {
+            this.collectionCount = collectionCount;
         }
     }
 }

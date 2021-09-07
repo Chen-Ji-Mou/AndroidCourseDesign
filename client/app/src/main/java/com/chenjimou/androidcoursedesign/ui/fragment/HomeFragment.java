@@ -67,7 +67,6 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     LoadAnimationDialog mDialog;
 
     final List<GetAllSpacesModel.DataDTO> dataOnUI = new ArrayList<>();
-
     final List<Integer> sourceWidths = new ArrayList<>();
     final List<Integer> sourceHeights = new ArrayList<>();
     final List<Integer> collectionCounts = new ArrayList<>();
