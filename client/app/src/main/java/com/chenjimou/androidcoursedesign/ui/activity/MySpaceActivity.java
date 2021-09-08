@@ -3,7 +3,6 @@ package com.chenjimou.androidcoursedesign.ui.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.Observable;
@@ -13,13 +12,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import okhttp3.ResponseBody;
+import okhttp3.RequestBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import android.app.Service;
 import android.os.Bundle;
+import android.os.Vibrator;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,35 +39,40 @@ import com.chenjimou.androidcoursedesign.databinding.ActivityMySpaceBinding;
 import com.chenjimou.androidcoursedesign.databinding.LayoutMySpaceItemBinding;
 import com.chenjimou.androidcoursedesign.inter.RetrofitRequest;
 import com.chenjimou.androidcoursedesign.model.DeleteSpaceModel;
-import com.chenjimou.androidcoursedesign.model.GetAllSpacesModel;
 import com.chenjimou.androidcoursedesign.model.GetStarCountModel;
 import com.chenjimou.androidcoursedesign.model.GetUserSpaceModel;
 import com.chenjimou.androidcoursedesign.ui.MySpaceItemDecoration;
-import com.chenjimou.androidcoursedesign.ui.MySpaceItemTouchCallback;
 import com.chenjimou.androidcoursedesign.utils.DateUtils;
-import com.chenjimou.androidcoursedesign.utils.DecodeUtils;
+import com.chenjimou.androidcoursedesign.utils.DisplayUtils;
 import com.chenjimou.androidcoursedesign.utils.SharedPreferencesUtils;
 import com.chenjimou.androidcoursedesign.utils.SystemBarUtil;
 import com.chenjimou.androidcoursedesign.widget.LoadAnimationDialog;
+import com.chenjimou.androidcoursedesign.widget.MyPopupWindow;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class MySpaceActivity extends AppCompatActivity implements MySpaceItemTouchCallback.onItemDeleteListener
+public class MySpaceActivity extends AppCompatActivity implements View.OnClickListener
 {
     ActivityMySpaceBinding mBinding;
     Disposable mDisposable;
     Retrofit mRetrofit;
     MySpaceAdapter mAdapter;
     LoadAnimationDialog mDialog;
+    MyPopupWindow mPopupWindow;
+    Vibrator mVibrator;
 
     final List<GetUserSpaceModel.DataDTO> dataOnUI = new ArrayList<>();
     final List<Integer> collectionCounts = new ArrayList<>();
-
     boolean isError = false;
     int lastLoadPosition = -1;
+    int currentPosition = -1;
+
+    int screenWidth = -1;
+
+    private static final String TAG = "MySpaceActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -79,6 +88,10 @@ public class MySpaceActivity extends AppCompatActivity implements MySpaceItemTou
         SystemBarUtil.setStatusBarColor(this, R.color.white);
         SystemBarUtil.setAndroidNativeLightStatusBar(this, true);
 
+        mVibrator = (Vibrator) getSystemService(Service.VIBRATOR_SERVICE);
+
+        screenWidth = DisplayUtils.getScreenWidth(this);
+
         mBinding.toolbar.setTitle("");
         setSupportActionBar(mBinding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -92,10 +105,6 @@ public class MySpaceActivity extends AppCompatActivity implements MySpaceItemTou
         mAdapter = new MySpaceAdapter();
         mBinding.recyclerView.setAdapter(mAdapter);
 
-        MySpaceItemTouchCallback callback = new MySpaceItemTouchCallback();
-        callback.setOnItemDeleteListener(this);
-        new ItemTouchHelper(callback).attachToRecyclerView(mBinding.recyclerView);
-
         mRetrofit = new Retrofit.Builder()
                 .baseUrl(getString(R.string.base_url))
                 .client(new OkHttpClient.Builder()
@@ -104,6 +113,16 @@ public class MySpaceActivity extends AppCompatActivity implements MySpaceItemTou
                         .build())
                 .addConverterFactory(GsonConverterFactory.create(new Gson()))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+
+        mPopupWindow = new MyPopupWindow.Builder(this)
+                .cancelTouchout(true)
+                .view(R.layout.layout_delete_space)
+                .isFocusable(true)
+                .animStyle(R.style.AnimDown)
+                .addViewOnclick(R.id.btn_delete_space, this)
+                .widthpx(screenWidth - DisplayUtils.dip2px(this, 16))
+                .heightdp(50)
                 .build();
     }
 
@@ -117,8 +136,11 @@ public class MySpaceActivity extends AppCompatActivity implements MySpaceItemTou
 
     void reset()
     {
-        dataOnUI.clear();
         isError = false;
+        lastLoadPosition = -1;
+        currentPosition = -1;
+        dataOnUI.clear();
+        collectionCounts.clear();
     }
 
     void loadFromInternet()
@@ -245,8 +267,13 @@ public class MySpaceActivity extends AppCompatActivity implements MySpaceItemTou
 
     void deleteSpace(String spaceId)
     {
+        StringBuilder data = new StringBuilder();
+        data.append("id").append("=").append(spaceId);
+        String jso = data.substring(0, data.length() - 1);
+
         mRetrofit.create(RetrofitRequest.class)
-        .deleteSpace(SharedPreferencesUtils.getInstance().getToken(), spaceId)
+        .deleteSpace(SharedPreferencesUtils.getInstance().getToken(),
+                RequestBody.create(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"), jso))
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Observer<DeleteSpaceModel>()
@@ -279,17 +306,25 @@ public class MySpaceActivity extends AppCompatActivity implements MySpaceItemTou
             @Override
             public void onComplete()
             {
-                Toast.makeText(MySpaceActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
+                if (!isError)
+                {
+                    dataOnUI.remove(currentPosition);
+                    mAdapter.notifyItemRemoved(currentPosition);
+                    Toast.makeText(MySpaceActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(MySpaceActivity.this, "删除失败", Toast.LENGTH_SHORT).show();
+                }
+                mPopupWindow.dismiss();
             }
         });
     }
 
     @Override
-    public void onItemDelete(int position)
+    public void onClick(View v)
     {
-        dataOnUI.remove(position);
-        mAdapter.notifyDataSetChanged();
-        deleteSpace(dataOnUI.get(position).getId());
+        deleteSpace(dataOnUI.get(currentPosition).getId());
     }
 
     @Override
@@ -367,6 +402,17 @@ public class MySpaceActivity extends AppCompatActivity implements MySpaceItemTou
                 tv_space_content = itemBinding.tvSpaceContent;
                 tv_space_count = itemBinding.tvSpaceCount;
                 tv_space_date = itemBinding.tvSpaceDate;
+                itemView.setOnLongClickListener(new View.OnLongClickListener()
+                {
+                    @Override
+                    public boolean onLongClick(View v)
+                    {
+                        mVibrator.vibrate(70);
+                        currentPosition = getLayoutPosition();
+                        mPopupWindow.showAsDropDown(itemView);
+                        return true;
+                    }
+                });
             }
         }
     }

@@ -20,7 +20,9 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -85,11 +87,10 @@ public interface RetrofitRequest
     /**
      * 删除自己的动态
      * @param token 令牌
-     * @param spaceId 动态id
      */
     @HTTP(method = "DELETE", path = "/api/post", hasBody = true)
     @FormUrlEncoded
-    Observable<DeleteSpaceModel> deleteSpace(@Header("Authorization") String token, @Field("id") String spaceId);
+    Observable<DeleteSpaceModel> deleteSpace(@Header("Authorization") String token, @Body RequestBody body);
 
     /**
      * 获取某条动态的具体信息
@@ -142,11 +143,10 @@ public interface RetrofitRequest
     /**
      * 删除自己动态下的某条评论
      * @param token 令牌
-     * @param commentId 评论id
      */
     @HTTP(method = "DELETE", path = "/api/post", hasBody = true)
     @FormUrlEncoded
-    Observable<DeleteCommentModel> deleteComment(@Header("Authorization") String token, @Field("id") String commentId);
+    Observable<DeleteCommentModel> deleteComment(@Header("Authorization") String token, @Body RequestBody body);
 
     /* ======================================== star =================================================== */
 

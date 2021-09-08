@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/btn_delete_space"
+    android:text="@string/btn_delete_space"
+    android:textColor="@color/white"
+    android:textStyle="bold"
+    android:textSize="14sp"
+    android:background="@drawable/bg_delete_space_background"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="50dp" />
