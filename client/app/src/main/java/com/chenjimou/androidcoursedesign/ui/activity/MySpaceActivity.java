@@ -267,13 +267,8 @@ public class MySpaceActivity extends AppCompatActivity implements View.OnClickLi
 
     void deleteSpace(String spaceId)
     {
-        StringBuilder data = new StringBuilder();
-        data.append("id").append("=").append(spaceId);
-        String jso = data.substring(0, data.length() - 1);
-
         mRetrofit.create(RetrofitRequest.class)
-        .deleteSpace(SharedPreferencesUtils.getInstance().getToken(),
-                RequestBody.create(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"), jso))
+        .deleteSpace(SharedPreferencesUtils.getInstance().getToken(), spaceId)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Observer<DeleteSpaceModel>()
@@ -376,8 +371,7 @@ public class MySpaceActivity extends AppCompatActivity implements View.OnClickLi
 
             dto.setCollectionCount(collectionCounts.get(position));
 
-            holder.tv_space_count.setText(String.format(getString(R.string.tv_collection_count),
-                    collectionCounts.get(position)));
+            holder.tv_space_count.setText(String.format(getString(R.string.tv_favorite_count), collectionCounts.get(position)));
         }
 
         @Override

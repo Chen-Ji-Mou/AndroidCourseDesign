@@ -88,9 +88,9 @@ public interface RetrofitRequest
      * 删除自己的动态
      * @param token 令牌
      */
-    @HTTP(method = "DELETE", path = "/api/post", hasBody = true)
+    @POST("/api/post/delete")
     @FormUrlEncoded
-    Observable<DeleteSpaceModel> deleteSpace(@Header("Authorization") String token, @Body RequestBody body);
+    Observable<DeleteSpaceModel> deleteSpace(@Header("Authorization") String token, @Field("id") String spaceId);
 
     /**
      * 获取某条动态的具体信息
@@ -144,9 +144,9 @@ public interface RetrofitRequest
      * 删除自己动态下的某条评论
      * @param token 令牌
      */
-    @HTTP(method = "DELETE", path = "/api/post", hasBody = true)
+    @POST("/api/comment/delete")
     @FormUrlEncoded
-    Observable<DeleteCommentModel> deleteComment(@Header("Authorization") String token, @Body RequestBody body);
+    Observable<DeleteCommentModel> deleteComment(@Header("Authorization") String token, @Field("id") String commentId);
 
     /* ======================================== star =================================================== */
 

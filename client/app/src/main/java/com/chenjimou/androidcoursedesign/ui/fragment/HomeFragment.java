@@ -70,7 +70,6 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
     final List<Integer> sourceWidths = new ArrayList<>();
     final List<Integer> sourceHeights = new ArrayList<>();
     final List<Integer> collectionCounts = new ArrayList<>();
-
     boolean isError = false;
     int lastLoadPosition = -1;
 
