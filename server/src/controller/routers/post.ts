@@ -86,7 +86,7 @@ export default function addPostRouter(router: Router<any, {}>, database: MySQL) 
         /** 
          * 删除某条动态
          */
-        .delete("/api/post", handler(
+        .post("/api/post/delete", handler(
             async (ctx) => {
                 const token = ctx.header.authorization;
                 const tokenData = verifyToken(token);
