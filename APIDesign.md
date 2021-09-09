@@ -155,7 +155,7 @@ POST: /api/post（带token）
 
 ### 删除某条动态
 
-DELETE: /api/post（带token）
+POST: /api/post/delete（带token）
 
 ```json
 {
@@ -338,7 +338,7 @@ GET：/api/comment/list（带token）
 
 ### 删除某条评论
 
-DELETE: /api/comment（带token）
+POST: /api/comment/delete（带token）
 
 ```json
 {

@@ -82,7 +82,7 @@ export default function addCommentRouter(router: Router<any, {}>, database: MySQ
         /** 
          * 删除某条评论
          */
-        .delete("/api/comment", handler(
+        .post("/api/comment/delete", handler(
             async (ctx) => {
                 const token = ctx.header.authorization;
                 const tokenData = verifyToken(token);
