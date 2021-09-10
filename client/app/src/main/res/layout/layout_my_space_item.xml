@@ -31,6 +31,9 @@
             android:textColor="@color/Grey900"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:maxLines="1"
+            android:maxEms="11"
+            android:ellipsize="end"
             app:layout_constraintStart_toEndOf="@+id/iv_space_cover"
             app:layout_constraintTop_toTopOf="parent" />
     

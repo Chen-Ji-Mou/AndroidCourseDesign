@@ -51,6 +51,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -243,6 +244,7 @@ public class SpaceDetailActivity extends AppCompatActivity
                             GetCommentsModel getCommentsModel)
             {
                 isError = false;
+                Collections.sort(getCommentsModel.getData());
                 comments.addAll(getCommentsModel.getData());
             }
 

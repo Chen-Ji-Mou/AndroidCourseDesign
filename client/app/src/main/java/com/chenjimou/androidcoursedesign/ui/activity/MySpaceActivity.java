@@ -51,6 +51,7 @@ import com.chenjimou.androidcoursedesign.widget.MyPopupWindow;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -166,6 +167,7 @@ public class MySpaceActivity extends AppCompatActivity implements View.OnClickLi
                             GetUserSpaceModel getUserSpaceModel)
             {
                 isError = false;
+                Collections.sort(getUserSpaceModel.getData());
                 dataOnUI.addAll(getUserSpaceModel.getData());
             }
 

@@ -1,5 +1,8 @@
 package com.chenjimou.androidcoursedesign.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -47,7 +50,7 @@ public class GetNoticesModel implements Serializable
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DataDTO implements Serializable
+    public static class DataDTO implements Serializable, Parcelable, Comparable<GetNoticesModel.DataDTO>
     {
         @JsonProperty("id")
         private String id;
@@ -63,6 +66,32 @@ public class GetNoticesModel implements Serializable
         private long date;
         @JsonProperty("postId")
         private String postId;
+
+        protected DataDTO(Parcel in)
+        {
+            id = in.readString();
+            sender = in.readString();
+            content = in.readString();
+            receiver = in.readString();
+            read = in.readInt();
+            date = in.readLong();
+            postId = in.readString();
+        }
+
+        public static final Creator<DataDTO> CREATOR = new Creator<DataDTO>()
+        {
+            @Override
+            public DataDTO createFromParcel(Parcel in)
+            {
+                return new DataDTO(in);
+            }
+
+            @Override
+            public DataDTO[] newArray(int size)
+            {
+                return new DataDTO[size];
+            }
+        };
 
         public String getId()
         {
@@ -132,6 +161,31 @@ public class GetNoticesModel implements Serializable
         public void setPostId(String postId)
         {
             this.postId = postId;
+        }
+
+        @Override
+        public int describeContents()
+        {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags)
+        {
+            dest.writeString(id);
+            dest.writeString(sender);
+            dest.writeString(content);
+            dest.writeString(receiver);
+            dest.writeInt(read);
+            dest.writeLong(date);
+            dest.writeString(postId);
+        }
+
+        @Override
+        public int compareTo(DataDTO o)
+        {
+            // 降序排列
+            return (int)(o.getDate() - this.getDate());
         }
     }
 }

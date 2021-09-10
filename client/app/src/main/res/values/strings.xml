@@ -32,4 +32,6 @@
     <string name="tv_space_content">动态内容</string>
     <string name="tv_space_date">2021-09-07</string>
     <string name="btn_delete_space">删除</string>
+    <string name="tv_my_space_title">我的动态</string>
+    <string name="tv_notice_title">通知</string>
 </resources>

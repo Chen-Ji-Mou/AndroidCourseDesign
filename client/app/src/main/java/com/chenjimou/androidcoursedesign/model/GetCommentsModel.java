@@ -47,7 +47,7 @@ public class GetCommentsModel implements Serializable
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DataDTO implements Serializable
+    public static class DataDTO implements Serializable, Comparable<GetCommentsModel.DataDTO>
     {
         @JsonProperty("id")
         private String id;
@@ -108,6 +108,13 @@ public class GetCommentsModel implements Serializable
         public void setUserId(String userId)
         {
             this.userId = userId;
+        }
+
+        @Override
+        public int compareTo(DataDTO o)
+        {
+            // 降序排列
+            return (int)(o.getDate() - this.getDate());
         }
     }
 }

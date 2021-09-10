@@ -47,7 +47,7 @@ public class GetAllSpacesModel implements Serializable
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DataDTO implements Serializable
+    public static class DataDTO implements Serializable, Comparable<GetAllSpacesModel.DataDTO>
     {
         @JsonProperty("id")
         private String id;
@@ -132,6 +132,13 @@ public class GetAllSpacesModel implements Serializable
         public void setCollectionCount(int collectionCount)
         {
             this.collectionCount = collectionCount;
+        }
+
+        @Override
+        public int compareTo(DataDTO o)
+        {
+            // 降序排列
+            return (int)(o.getDate() - this.getDate());
         }
     }
 }

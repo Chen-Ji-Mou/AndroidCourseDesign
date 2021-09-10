@@ -37,6 +37,7 @@ import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -155,6 +156,7 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
             {
 
                 isError = false;
+                Collections.sort(getAllSpacesModel.getData());
                 dataOnUI.addAll(getAllSpacesModel.getData());
             }
 
