@@ -275,7 +275,7 @@ public class Banner extends FrameLayout implements ViewPager.OnPageChangeListene
                             downTime = System.currentTimeMillis();
                             break;
                         case MotionEvent.ACTION_UP:
-//                            mAutoRollTimer.start(mAutoRollTimer.interval);
+                        //mAutoRollTimer.start(mAutoRollTimer.interval);
                             int moveX = (int)v.getX();
                             long moveTime = System.currentTimeMillis();
                             //判断为点击的条件
@@ -289,7 +289,7 @@ public class Banner extends FrameLayout implements ViewPager.OnPageChangeListene
                             }
                             break;
                         case MotionEvent.ACTION_CANCEL:
-//                            mAutoRollTimer.start(mAutoRollTimer.interval);
+                        //mAutoRollTimer.start(mAutoRollTimer.interval);
                             break;
                     }
                     return true;
