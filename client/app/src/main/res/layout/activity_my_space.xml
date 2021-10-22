@@ -21,7 +21,8 @@
             android:layout_gravity="center"
             android:text="@string/tv_my_space_title"
             android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@color/Grey900" />
         
     </androidx.appcompat.widget.Toolbar>
     

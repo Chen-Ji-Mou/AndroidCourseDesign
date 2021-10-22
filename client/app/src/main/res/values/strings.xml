@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">AndroidCourseDesign</string>
+    <string name="app_name">图片分享</string>
+    
     <string name="base_url">https://android.therainisme.com</string>
     <string name="request_picture_url">https://android.therainisme.com/api/picture/</string>
     

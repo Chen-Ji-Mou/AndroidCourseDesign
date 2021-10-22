@@ -31,4 +31,9 @@
         <item name="android:windowEnterAnimation">@anim/push_scale_in</item>
         <item name="android:windowExitAnimation">@anim/push_scale_out</item>
     </style>
+    
+    <style name="MaterialAppTheme.Launcher" parent="MaterialAppTheme">
+        <item name="android:windowBackground">@drawable/bg_window_background</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
 </resources>
