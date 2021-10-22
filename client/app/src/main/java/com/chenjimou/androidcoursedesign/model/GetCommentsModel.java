@@ -114,7 +114,10 @@ public class GetCommentsModel implements Serializable
         public int compareTo(DataDTO o)
         {
             // 降序排列
-            return (int)(o.getDate() - this.getDate());
+            if (o.getDate() - this.getDate() >= 0)
+                return 1;
+            else
+                return -1;
         }
     }
 }

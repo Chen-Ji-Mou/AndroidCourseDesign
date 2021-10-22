@@ -135,10 +135,20 @@ public class GetAllSpacesModel implements Serializable
         }
 
         @Override
+        public String toString()
+        {
+            return "DataDTO{" + "id='" + id + '\'' + ", content='" + content + '\'' + ", date=" + date + ", userId='" + userId + '\'' +
+                    ", pictures=" + pictures + ", isStar=" + isStar + ", collectionCount=" + collectionCount + '}';
+        }
+
+        @Override
         public int compareTo(DataDTO o)
         {
             // 降序排列
-            return (int)(o.getDate() - this.getDate());
+            if (o.getDate() - this.getDate() >= 0)
+                return 1;
+            else
+                return -1;
         }
     }
 }

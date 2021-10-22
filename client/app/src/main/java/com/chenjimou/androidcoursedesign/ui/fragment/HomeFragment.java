@@ -76,6 +76,8 @@ public class HomeFragment extends LazyLoadFragment implements OnRefreshListener,
 
     public static final int ACTION_POST_STAR = 0;
 
+    private static final String TAG = "HomeFragment";
+
     @Override
     protected ViewBinding createViewBinding(LayoutInflater inflater, ViewGroup container)
     {
